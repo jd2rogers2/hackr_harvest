@@ -1,0 +1,41 @@
+version: '3.1'
+
+volumes:
+  pg_vol:
+    external: true
+
+services:
+  web_frontend:
+    build:
+      context: ./web_frontend
+      dockerfile: Dockerfile.dev
+    environment:
+      - REACT_APP_HH_API_URL=localhost:3000
+    ports:
+      - 3001:3001
+    volumes:
+      - ./web_frontend:/app
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.dev
+    # tty: true
+    ports:
+      - 3000:3000
+    volumes:
+      - ./api:/app
+    environment:
+      - DATABASE_URL=postgresql://user:password@pg_con/db
+
+  pg_con:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: db
+    ports:
+      - 5432:5432
+    volumes:
+      - pg_vol:/data/db
+
