@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const { Events } = require('./models');
 
 
 let corsOptions = {
@@ -10,17 +11,14 @@ const app = express();
 app.use(cors(corsOptions));
 app.use(express.json());
 
-const data = [];
-
-app.get('/', (req, res) => {
-  console.log('data', data);
-  res.send({ data });
+app.get('/', async (req, res) => {
+  const events = await Events.findAll();
+  res.send({ events });
 });
 
-app.post('/', (req, res) => {
-  console.log('req.body', req.body);
-  data.push(req.body)
-  res.send(true);
+app.post('/', async (req, res) => {
+  const event = await Events.create(req.body);
+  res.send({ event });
 });
 
 const port = 3000;

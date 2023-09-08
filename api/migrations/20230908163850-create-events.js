@@ -36,11 +36,11 @@ module.exports = {
         type: Sequelize.TEXT
       },
       createdAt: {
-        defaultValue: DataTypes.NOW,
+        defaultValue: Sequelize.DataTypes.NOW,
         type: Sequelize.DATE,
       },
       updatedAt: {
-        defaultValue: DataTypes.NOW,
+        defaultValue: Sequelize.DataTypes.NOW,
         type: Sequelize.DATE,
       }
     });

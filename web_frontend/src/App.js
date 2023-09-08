@@ -6,13 +6,13 @@ import './App.css';
 const REACT_APP_HH_API_URL = process.env.REACT_APP_HH_API_URL;
 
 function App() {
-  const [data, setData] = useState();
+  const [events, setEvents] = useState([]);
   const [formData, setFormData] = useState({});
 
   const getData = async () => {
     const res = await fetch(`http://${REACT_APP_HH_API_URL}/`);
-    const data = await res.text();
-    setData(data);
+    const data = await res.json();
+    setEvents(data.events);
   }
 
   const handleTextChange = (e) => {
@@ -46,9 +46,13 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>get data</h1>
-        <p>data: {data}</p>
+        <h1>events data</h1>
         <button onClick={getData}>refresh data</button>
+        <ul>
+          {events.map(event => (
+            <li>id: {event.id} -- name: {event.name} -- created: {event.createdAt}</li>
+          ))}
+        </ul>
         <h1>send data</h1>
         <form onSubmit={handleSubmit}>
           <input type="text" name="name" value={formData.name || ''} onChange={handleTextChange} />
