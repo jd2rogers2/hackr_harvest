@@ -1,9 +1,5 @@
 version: '3.1'
 
-volumes:
-  pg_vol:
-    external: true
-
 services:
   web_frontend:
     build:
@@ -20,22 +16,12 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile.dev
-    # tty: true
     ports:
       - 3000:3000
     volumes:
       - ./api:/app
     environment:
-      - DATABASE_URL=postgresql://user:password@pg_con/db
-
-  pg_con:
-    image: postgres:latest
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: db
-    ports:
-      - 5432:5432
-    volumes:
-      - pg_vol:/data/db
-
+      - RDS_DB_NAME=${RDS_DB_NAME}
+      - RDS_DB_USER=${RDS_DB_USER}
+      - RDS_DB_PW=${RDS_DB_PW}
+      - RDS_DB_HOST=hackr-harvest-rds.ch5p5impb82f.us-west-2.rds.amazonaws.com
