@@ -1,6 +1,3 @@
-// const pg = require('pg');
-
-
 module.exports = {
     development: {
         database: process.env.RDS_DB_NAME,
@@ -17,7 +14,6 @@ module.exports = {
                 rejectUnauthorized: false,
             }
         },
-        // dialectModule: pg,
         pool: { maxConnections: 5, maxIdleTime: 30},
         language: 'en'
     },
