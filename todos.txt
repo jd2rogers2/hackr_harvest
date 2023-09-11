@@ -1,0 +1,16 @@
+TODOs:
+
+- finish migrations
+- finish api<>db integration
+- brainstorm, write all endpoints
+- build frontend
+- deploy api on beanstalk
+    - integrate KMS or secrets manager
+- deploy frontend on s3
+- mess around with cloud watch
+- deploy frontend on amplify
+- put api behind api gateway
+- add elasticache to db
+- move 1 endpoint to lambda (test performance before and after)
+- mess around with cloud watch
+- ci/cd with code deploy/code build

@@ -5,6 +5,11 @@ WORKDIR /app
 COPY package.json /app/
 COPY package-lock.json /app/
 COPY index.js /app/
+COPY migrations /app/
+COPY models /app/
+COPY config /app/
+COPY dbConnection.js /app/
+COPY .sequelizerc /app/
 
 RUN npm ci
 

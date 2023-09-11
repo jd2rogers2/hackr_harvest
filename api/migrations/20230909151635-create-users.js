@@ -38,12 +38,12 @@ module.exports = {
       },
       createdAt: {
         allowNull: false,
-        defaultValue: DataTypes.NOW,
+        defaultValue: Sequelize.DataTypes.NOW,
         type: Sequelize.DATE
       },
       updatedAt: {
         allowNull: false,
-        defaultValue: DataTypes.NOW,
+        defaultValue: Sequelize.DataTypes.NOW,
         type: Sequelize.DATE
       }
     });

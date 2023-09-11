@@ -10,16 +10,20 @@ module.exports = {
       eventId: {
         type: Sequelize.DataTypes.INTEGER,
         allowNull: false,
-        model: Events,
-        key: 'id',
-        deferrable: Deferrable.INITIALLY_IMMEDIATE
+        references: {
+          model: Events,
+          key: 'id',
+          deferrable: Sequelize.Deferrable.NOT,
+        },
       },
       userId: {
         type: Sequelize.DataTypes.INTEGER,
         allowNull: false,
-        model: Users,
-        key: 'id',
-        deferrable: Deferrable.INITIALLY_IMMEDIATE
+        references: {
+          model: Users,
+          key: 'id',
+          deferrable: Sequelize.Deferrable.NOT,
+        },
       }
     });
   },

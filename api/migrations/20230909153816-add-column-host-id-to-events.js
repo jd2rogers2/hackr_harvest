@@ -11,9 +11,11 @@ module.exports = {
         queryInterface.addColumn('Events', 'hostId', {
           type: Sequelize.DataTypes.INTEGER,
           allowNull: false,
-          model: Users,
-          key: 'id',
-          deferrable: Deferrable.INITIALLY_IMMEDIATE
+          references: {
+            model: Users,
+            key: 'id',
+            deferrable: Sequelize.Deferrable.NOT,
+          },
         }, { transaction: t }),
       ]);
     });
