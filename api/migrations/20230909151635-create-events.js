@@ -1,4 +1,8 @@
 'use strict';
+
+const { Users } = require('../models');
+
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -13,7 +17,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      attendee_limit: {
+      attendeeLimit: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
@@ -21,19 +25,31 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      start_time: {
+      startTime: {
         type: Sequelize.DATE,
         allowNull: false,
       },
-      end_time: {
+      endTime: {
         type: Sequelize.DATE,
         allowNull: false,
       },
-      image_url: {
+      imageUrl: {
         type: Sequelize.STRING
       },
       description: {
         type: Sequelize.TEXT
+      },
+      hostId: {
+        type: Sequelize.DataTypes.INTEGER,
+        references: {
+          model: {
+            tableName: 'Users',
+            scema: 'schema',
+          },
+          key: 'id',
+          deferrable: Sequelize.Deferrable.NOT,
+        },
+        allowNull: false,
       },
       createdAt: {
         defaultValue: Sequelize.DataTypes.NOW,

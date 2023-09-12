@@ -9,21 +9,27 @@ module.exports = {
     return queryInterface.createTable('EventAttendees', {
       eventId: {
         type: Sequelize.DataTypes.INTEGER,
-        allowNull: false,
         references: {
-          model: Events,
+          model: {
+            tableName: 'Events',
+            scema: 'schema',
+          },
           key: 'id',
           deferrable: Sequelize.Deferrable.NOT,
         },
+        allowNull: false,
       },
       userId: {
         type: Sequelize.DataTypes.INTEGER,
-        allowNull: false,
         references: {
-          model: Users,
+          model: {
+            tableName: 'Users',
+            scema: 'schema',
+          },
           key: 'id',
           deferrable: Sequelize.Deferrable.NOT,
         },
+        allowNull: false,
       }
     });
   },

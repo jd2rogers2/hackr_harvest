@@ -22,7 +22,7 @@ module.exports = {
           isEmail: true,
         },
       },
-      image_url: {
+      imageUrl: {
         type: Sequelize.STRING
       },
       tagline: {
