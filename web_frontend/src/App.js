@@ -7,38 +7,72 @@ const REACT_APP_HH_API_URL = process.env.REACT_APP_HH_API_URL;
 
 function App() {
   const [events, setEvents] = useState([]);
-  const [formData, setFormData] = useState({});
+  const [eventFormData, setEventFormData] = useState({});
+  const [users, setUsers] = useState([]);
+  const [userFormData, setUserFormData] = useState({});
 
-  const getData = async () => {
-    const res = await fetch(`http://${REACT_APP_HH_API_URL}/`);
+  const getUsers = async () => {
+    const res = await fetch(`http://${REACT_APP_HH_API_URL}/users`);
     const data = await res.json();
-    setEvents(data.events);
+    setUsers(data.users);
   }
 
-  const handleTextChange = (e) => {
-    setFormData({
-      ...formData,
+  const handleUserChange = (e) => {
+    setUserFormData({
+      ...eventFormData,
       [e.target.name]: e.target.value,
     })
   }
 
-  const handleSubmit = async (e) => {
+  const handleUserSubmit = async (e) => {
     e.preventDefault();
 
-    await fetch(`http://${REACT_APP_HH_API_URL}/`, {
+    await fetch(`http://${REACT_APP_HH_API_URL}/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        host_id: "host_id",
-        attendee_limit: 5,
+        email: 'jd2rogers2@gmail.com',
+        image_url: '',
+        tagline: 'founder',
+        city: 'seattle',
+        role: 'admin',
+        ...userFormData,
+      }),
+    });
+  }
+
+  const getEvents = async () => {
+    const res = await fetch(`http://${REACT_APP_HH_API_URL}/events`);
+    const data = await res.json();
+    setEvents(data.events);
+  }
+
+  const handleEventChange = (e) => {
+    setEventFormData({
+      ...eventFormData,
+      [e.target.name]: e.target.value,
+    })
+  }
+
+  const handleEventSubmit = async (e) => {
+    e.preventDefault();
+
+    await fetch(`http://${REACT_APP_HH_API_URL}/events`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        hostId: 1,
+        attendeeLimit: 5,
         location: "location",
-        start_time: "2023-09-08",
-        end_time: "2023-10-31",
-        image_url: "image_url",
+        startTime: "2023-09-08",
+        endTime: "2023-10-31",
+        imageUrl: "image_url",
         description: "description",
-        ...formData,
+        ...eventFormData,
       }),
     });
   }
@@ -46,16 +80,28 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>events data</h1>
-        <button onClick={getData}>refresh data</button>
+        <h1>users data</h1>
+        <button onClick={getUsers}>refresh users</button>
         <ul>
-          {events.map(event => (
-            <li>id: {event.id} -- name: {event.name} -- created: {event.createdAt}</li>
+          {users.map(user => (
+            <li key={user.id}>id: {user.id} -- username: {user.username} -- email: {user.email}</li>
           ))}
         </ul>
-        <h1>send data</h1>
-        <form onSubmit={handleSubmit}>
-          <input type="text" name="name" value={formData.name || ''} onChange={handleTextChange} />
+        <h1>send user data</h1>
+        <form onSubmit={handleUserSubmit}>
+          <input type="text" name="username" value={userFormData.username || ''} onChange={handleUserChange} />
+          <button>submit</button>
+        </form>
+        <h1>events data</h1>
+        <button onClick={getEvents}>refresh events</button>
+        <ul>
+          {events.map(event => (
+            <li key={event.id}>id: {event.id} -- name: {event.name} -- created: {event.createdAt}</li>
+          ))}
+        </ul>
+        <h1>send event data</h1>
+        <form onSubmit={handleEventSubmit}>
+          <input type="text" name="name" value={eventFormData.name || ''} onChange={handleEventChange} />
           <button>submit</button>
         </form>
       </header>

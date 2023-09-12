@@ -7,18 +7,18 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class Events extends Model {
     static associate(models) {
-      Events.belongsTo(models.Users, { as: 'hostings' });
+      Events.belongsTo(models.Users, { as: 'hostings', foreignKey: 'hostId' });
       Events.belongsToMany(models.Users, { as: 'attendings', through: 'EventAttendees' });
     }
   }
 
   Events.init({
     name: DataTypes.STRING,
-    attendee_limit: DataTypes.INTEGER,
+    attendeeLimit: DataTypes.INTEGER,
     location: DataTypes.STRING,
-    start_time: DataTypes.DATE,
-    end_time: DataTypes.DATE,
-    image_url: DataTypes.STRING,
+    startTime: DataTypes.DATE,
+    endTime: DataTypes.DATE,
+    imageUrl: DataTypes.STRING,
     description: DataTypes.TEXT
   }, {
     sequelize,

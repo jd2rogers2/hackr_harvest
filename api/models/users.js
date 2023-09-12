@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   Users.init({
     username: DataTypes.STRING,
     email: DataTypes.STRING,
-    image_url: DataTypes.STRING,
+    imageUrl: DataTypes.STRING,
     tagline: DataTypes.STRING,
     city: DataTypes.STRING,
     role: DataTypes.ENUM('attendee', 'admin'),
