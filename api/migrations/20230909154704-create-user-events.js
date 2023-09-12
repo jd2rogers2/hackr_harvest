@@ -30,7 +30,17 @@ module.exports = {
           deferrable: Sequelize.Deferrable.NOT,
         },
         allowNull: false,
-      }
+      },
+      createdAt: {
+        allowNull: false,
+        defaultValue: Sequelize.DataTypes.NOW,
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        defaultValue: Sequelize.DataTypes.NOW,
+        type: Sequelize.DATE
+      },
     });
   },
 

@@ -1,5 +1,6 @@
 TODOs:
 
+- multi col unique constraint on EventAttendees
 - finish api<>db integration
 - brainstorm, write all endpoints
 - build frontend

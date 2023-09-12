@@ -11,6 +11,21 @@ function App() {
   const [users, setUsers] = useState([]);
   const [userFormData, setUserFormData] = useState({});
 
+  const handleAttendEvent = async (e, event) => {
+    e.preventDefault();
+
+    await fetch(`http://${REACT_APP_HH_API_URL}/eventAttendees`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: 3,
+        eventId: event.id,
+      }),
+    });
+  }
+
   const getUsers = async () => {
     const res = await fetch(`http://${REACT_APP_HH_API_URL}/users`);
     const data = await res.json();
@@ -33,11 +48,11 @@ function App() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        email: 'jd2rogers2@gmail.com',
+        email: 'joeyj.jambalaya3@gmail.com',
         image_url: '',
-        tagline: 'founder',
+        tagline: 'bootcamp grad',
         city: 'seattle',
-        role: 'admin',
+        role: 'attendee',
         ...userFormData,
       }),
     });
@@ -96,7 +111,10 @@ function App() {
         <button onClick={getEvents}>refresh events</button>
         <ul>
           {events.map(event => (
-            <li key={event.id}>id: {event.id} -- name: {event.name} -- created: {event.createdAt}</li>
+            <li key={event.id}>
+              id: {event.id} -- name: {event.name} -- created: {event.createdAt}
+              <button onClick={e => handleAttendEvent(e, event)}>attend this hackathon</button>
+            </li>
           ))}
         </ul>
         <h1>send event data</h1>

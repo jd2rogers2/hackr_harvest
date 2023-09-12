@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { Events, Users } = require('./models');
+const { EventAttendees, Events, Users } = require('./models');
 
 
 let corsOptions = {
@@ -12,7 +12,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 app.get('/events', async (req, res) => {
-  const events = await Events.findAll();
+  const events = await Events.findAll({ include: ['host', 'attendees'] });
   res.send({ events });
 });
 
@@ -22,13 +22,23 @@ app.post('/events', async (req, res) => {
 });
 
 app.get('/users', async (req, res) => {
-  const users = await Users.findAll();
+  const users = await Users.findAll({ include: ['hostings', 'attendings'] });
   res.send({ users });
 });
 
 app.post('/users', async (req, res) => {
   const user = await Users.create(req.body);
   res.send({ user });
+});
+
+// app.get('/eventAttendees', async (req, res) => {
+//   const eventAttendees = await EventAttendees.findAll();
+//   res.send({ eventAttendees });
+// });
+
+app.post('/eventAttendees', async (req, res) => {
+  const eventAttendee = await EventAttendees.create(req.body);
+  res.send({ eventAttendee });
 });
 
 const port = 3000;
