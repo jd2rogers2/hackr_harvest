@@ -1,16 +1,14 @@
 const express = require('express');
 
+const { eventsController } = require('../controllers');
+
 
 const router = express.Router();
 
-router.get('/events', async (req, res) => {
-    const events = await Events.findAll({ include: ['host', 'attendees'] });
-    res.send({ events });
-});
-  
-router.post('/events', async (req, res) => {
-    const event = await Events.create(req.body);
-    res.send({ event });
-});
-  
-module.exports = router
+router.get('', eventsController.getAllEvents);
+router.post('', eventsController.createEvent);
+router.get('/:eventId', eventsController.getEventById);
+router.patch('/:eventId', eventsController.updateEvent);
+router.delete('/:eventId', eventsController.deleteEvent);
+
+module.exports = router;
