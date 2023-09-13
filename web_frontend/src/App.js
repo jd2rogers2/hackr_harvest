@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 // import logo from './logo.svg';
-import './App.css';
 
 const REACT_APP_HH_API_URL = process.env.REACT_APP_HH_API_URL;
 
