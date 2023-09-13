@@ -10,7 +10,8 @@ module.exports = (sequelize, DataTypes) => {
       Users.hasMany(models.Events, { as: 'hostings', foreignKey: 'hostId', onDelete: 'SET NULL' });
       Users.belongsToMany(
         models.Events,
-        { as: 'attendings', through: models.EventAttendees, otherKey: 'eventId', foreignKey: 'userId' },
+        { as: 'attendings', through: models.EventAttendees,
+          otherKey: 'eventId', foreignKey: 'userId' },
       );
     }
   }
