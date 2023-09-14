@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { EventsList, Header, HeroContent } from '../components';
+
 
 function Home() {
   const [events, setEvents] = useState([]);
@@ -16,8 +18,9 @@ function Home() {
 
   return (
     <>
-        <HeroContent />
-        <EventsList events={events} />
+      <Header />
+      <HeroContent />
+      <EventsList events={events} />
     </>
   );
 }

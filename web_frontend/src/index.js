@@ -4,15 +4,17 @@ import reportWebVitals from './reportWebVitals';
 import {
   createBrowserRouter,
   RouterProvider,
+  Navigate,
 } from "react-router-dom";
 
 import './index.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-import Home from './pages/Home';
+import { Home}  from './pages';
 
 
 const router = createBrowserRouter([
-  { path: "/home", element: Home },
+  { path: "/home", element: <Home /> },
   // { path: "/users/auth", element: Blah },
   // { path: "/users/:userId", element: Blah },
   // { path: "/users/:userId/update", element: Blah },
@@ -20,13 +22,13 @@ const router = createBrowserRouter([
   // { path: "/events/:eventId", element: Blah },
   // { path: "/events/:eventId/update", element: Blah },
   // { path: "/events", element: Blah },
+  { path: "*", element: <Navigate to="/home" replace={true} /> },
 ]);
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <Header />
     <RouterProvider router={router} />
   </React.StrictMode>
 );
