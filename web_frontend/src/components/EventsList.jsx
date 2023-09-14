@@ -1,14 +1,13 @@
-import { useState } from 'react';
+import { EventCard } from '.';
 
-// import logo from './logo.svg';
 
-const REACT_APP_HH_API_URL = process.env.REACT_APP_HH_API_URL;
-
-function EventsList() {
+function EventsList({ events }) {
 
   return (
     <>
-        EventsList
+      {events.map(event => (
+        <EventCard event={event} />
+      ))}
     </>
   );
 }
