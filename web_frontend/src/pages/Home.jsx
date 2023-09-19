@@ -9,7 +9,7 @@ function Home() {
   const getEvents = async () => {
     const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/events?limit=3`);
     const data = await res.json();
-    setEvents([...data.events, ...data.events, ...data.events]);
+    setEvents(data.events);
   }
 
   useEffect(() => {
@@ -20,7 +20,7 @@ function Home() {
     <>
       <Header />
       <HeroContent />
-      <EventsList events={events} />
+      <EventsList events={events} hasShowMoreButton />
     </>
   );
 }

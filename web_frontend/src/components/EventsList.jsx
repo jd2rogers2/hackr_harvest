@@ -1,14 +1,27 @@
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Button from 'react-bootstrap/Button';
+
 import { EventCard } from '.';
 
 
-function EventsList({ events, hasShowMoreButton }) {
+function EventsList({ events, hasShowMoreButton = false }) {
 
   return (
     <>
       {events.map(event => (
-        <EventCard event={event} />
+        <EventCard key={event.id} event={event} />
       ))}
-      {hasShowMoreButton && ()}
+      {hasShowMoreButton && (
+        <Container fluid>
+          <Row>
+            <Col xs={{ span: 4, offset: 8 }} sm={{ span: 2, offset: 10 }}>
+              <Button variant="primary">Show more</Button>
+            </Col>
+          </Row>
+        </Container>
+      )}
     </>
   );
 }
