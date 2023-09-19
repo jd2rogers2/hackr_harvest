@@ -2,9 +2,11 @@ TODOs:
 
 - multi col unique constraint on EventAttendees
 - openApi?
-- write all endpoints
 - build frontend
+- write all endpoints
+    - events to be ordered
 - integrate with cognito
+- integrate imgs w/ s3
 - deploy api on beanstalk
     - integrate KMS or secrets manager
 - deploy frontend on s3

@@ -10,7 +10,7 @@ import {
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import { Home}  from './pages';
+import { EventDisplay, Home }  from './pages';
 
 
 const router = createBrowserRouter([
@@ -19,7 +19,7 @@ const router = createBrowserRouter([
   // { path: "/users/:userId", element: Blah },
   // { path: "/users/:userId/update", element: Blah },
   // { path: "/events/create", element: Blah },
-  // { path: "/events/:eventId", element: Blah },
+  { path: "/events/:eventId", element: <EventDisplay /> },
   // { path: "/events/:eventId/update", element: Blah },
   // { path: "/events", element: Blah },
   { path: "*", element: <Navigate to="/home" replace={true} /> },

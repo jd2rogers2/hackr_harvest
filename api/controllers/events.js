@@ -7,7 +7,16 @@ const createEvent = async (req, res) => {
 };
 
 const getEventById = async (req, res) => {
-    res.send();
+    const events = await Events.findAll({
+        where: { id: req.params.eventId },
+        include: ['host', 'attendees'],
+    });
+
+    if (events.length === 0) {
+        return res.status(400).send('Event not found');
+    }
+
+    res.send({ event: events[0] });
 };
 
 const getAllEvents = async (req, res) => {
