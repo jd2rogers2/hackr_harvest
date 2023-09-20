@@ -7,17 +7,17 @@ import {
   Navigate,
 } from "react-router-dom";
 
+import { Auth, EventDisplay, Home }  from './pages';
+
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
-import { EventDisplay, Home }  from './pages';
 
 
 const router = createBrowserRouter([
   { path: "/home", element: <Home /> },
-  // { path: "/users/auth", element: Blah },
-  // { path: "/users/:userId", element: Blah },
-  // { path: "/users/:userId/update", element: Blah },
+  { path: "/users/auth", element: <Auth /> },
+  { path: "/users/:userId", element: <Auth /> },
+  { path: "/users/:userId/update", element: <Auth /> },
   // { path: "/events/create", element: Blah },
   { path: "/events/:eventId", element: <EventDisplay /> },
   // { path: "/events/:eventId/update", element: Blah },
