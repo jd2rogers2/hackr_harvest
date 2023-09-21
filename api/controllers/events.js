@@ -2,6 +2,7 @@ const { Events } = require('../models');
 
 
 const createEvent = async (req, res) => {
+    // get user and make sure they're admin
     const event = await Events.create(req.body);
     res.send({ event });
 };

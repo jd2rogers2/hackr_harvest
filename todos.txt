@@ -3,6 +3,7 @@ TODOs:
 - multi col unique constraint on EventAttendees
 - openApi?
 - build frontend
+    - double check desktop doesn't look like trash
 - write all endpoints
     - events to be ordered
 - integrate with cognito

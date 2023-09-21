@@ -1,9 +1,11 @@
-import Auth from './Auth';
+import UserForm from './UserForm';
 import EventDisplay from './EventDisplay';
+import EventForm from './EventForm';
 import Home from './Home';
 
 export {
-    Auth,
+    UserForm,
     EventDisplay,
+    EventForm,
     Home,
 };
