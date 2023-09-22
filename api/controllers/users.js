@@ -2,6 +2,7 @@ const { Users } = require('../models');
 
 
 const createUser = async (req, res) => {
+    // console.log(req)
     // hardcode attendee role
     const user = await Users.create(req.body);
     res.send({ user });

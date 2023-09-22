@@ -19,7 +19,7 @@ function UserForm() {
     const handleInputChange = (e) => {
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value,
+            [e.target.name]: e.target.name === 'imageUrl' ? e.target.files[0] : e.target.value,
         })
     }
 
@@ -27,19 +27,41 @@ function UserForm() {
         setToggleKey(e.target.text);
     }
 
-    const handleFormSubmit = (e) => {
+    const handleFormSubmit = async (e) => {
         e.preventDefault();
+
+        // debugger;
+        const realFormData = new FormData();
+        for (let key in formData) {
+            if (key === 'imageUrl') {
+                realFormData.append(key, formData[key], 'blah');
+            } else {
+                realFormData.append(key, formData[key]);
+            }
+        }
+
         if (user) {
             // patch request
             navigate(`/users/${userId}`);
         } else if (toggleKey === 'Sign Up') {
-            // sign up post req
-            // pop modal for "check your email"
+            const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/users/signUp`, {
+                method: "POST",
+                // headers: { "Content-Type": "application/json" },
+                // body: JSON.stringify(formData),
+                body: realFormData,
+            });
+            if (res.ok) {
+                // pop modal for "check your email"
+            } else {
+                // display error
+            }
         } else {
             // Sign In post req
             navigate('/home');
         }
     }
+
+    console.log(formData)
 
     return (
         <>
@@ -76,7 +98,7 @@ function UserForm() {
                         placeholder="better be a good one"
                     />
                 </Form.Group>
-                {toggleKey === 'Sign Up' && (
+                {(toggleKey === 'Sign Up' || user) && (
                     <>
                         <Form.Group className="mb-3">
                             <Form.Label>username</Form.Label>
@@ -90,13 +112,12 @@ function UserForm() {
                             />
                         </Form.Group>
                         <Form.Group className="mb-3">
-                            <Form.Label>profile image</Form.Label>
-                            <Form.Control
-                                onChange={handleInputChange}
-                                type="text"
+                            <label htmlFor="imageUrl">imageUrl</label>
+                            <input
+                                type="file"
                                 id="imageUrl"
                                 name="imageUrl"
-                                value={formData.imageUrl || ''}
+                                onChange={handleInputChange}
                             />
                         </Form.Group>
                         <Form.Group className="mb-3">
