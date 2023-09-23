@@ -30,13 +30,12 @@ function UserForm() {
     const handleFormSubmit = async (e) => {
         e.preventDefault();
 
-        // debugger;
-        const realFormData = new FormData();
+        const FORMatted = new FormData();
         for (let key in formData) {
             if (key === 'imageUrl') {
-                realFormData.append(key, formData[key], 'blah');
+                FORMatted.append('file', formData[key]);
             } else {
-                realFormData.append(key, formData[key]);
+                FORMatted.append(key, formData[key]);
             }
         }
 
@@ -46,9 +45,7 @@ function UserForm() {
         } else if (toggleKey === 'Sign Up') {
             const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/users/signUp`, {
                 method: "POST",
-                // headers: { "Content-Type": "application/json" },
-                // body: JSON.stringify(formData),
-                body: realFormData,
+                body: FORMatted,
             });
             if (res.ok) {
                 // pop modal for "check your email"
@@ -60,8 +57,6 @@ function UserForm() {
             navigate('/home');
         }
     }
-
-    console.log(formData)
 
     return (
         <>

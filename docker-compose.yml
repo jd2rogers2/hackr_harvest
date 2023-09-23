@@ -25,3 +25,6 @@ services:
       - RDS_DB_USER=${RDS_DB_USER}
       - RDS_DB_PW=${RDS_DB_PW}
       - RDS_DB_HOST=hackr-harvest-rds.ch5p5impb82f.us-west-2.rds.amazonaws.com
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+      - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
