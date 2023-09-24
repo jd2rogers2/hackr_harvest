@@ -19,5 +19,5 @@ TODOs:
 - mess around with cloud watch
 - ci/cd with code deploy/code build
 - private s3 bucket, fix api to use role instead of main aws user's keys/perms
-
+- multer not saving files locally right?
 

@@ -1,5 +1,7 @@
 const { Upload } = require('@aws-sdk/lib-storage');
 const { S3Client } = require('@aws-sdk/client-s3');
+const { Op } = require("sequelize");
+const fs = require('fs');
 
 const { Users } = require('../models');
 
@@ -13,29 +15,57 @@ const s3Client = new S3Client({
 });
 
 
+const findDupUserErrors = async ({ email, username }) => {
+    const users = await Users.findAll({ where: { [Op.or]: [{ username }, { email }] } });
+    const existing = [];
+    if (users.find(user => user.email === email)) {
+        existing.push('email already exists')
+    }
+    if (users.find(user => user.username === username)) {
+        existing.push('username already exists')
+    }
+    return existing;
+}
+
+const isAllowedFileType = fileType => {
+    return fileType === 'image/jpeg' || fileType === 'image/jpg' || fileType === 'image/png';
+}
+
+
 const createUser = async (req, res) => {
-    const user = Users.build({ ...req.body, role: 'attendee' });
-    const validationErrors = Object.values(user.validate());
-    if (validationErrors.length) {
-        return res.status(404).send(validationErrors.join(', '));
+    const dupUserErrors = await findDupUserErrors(req.body);
+    if (dupUserErrors.length) {
+        return res.status(400).send(dupUserErrors.join(', '));
     }
 
-    const parallelUploads3 = new Upload({
+    if (!isAllowedFileType(req.file.mimetype)) {
+        return res.status(400).send('profile image file type not allowed');
+    }
+    console.log('req.file', req.file);
+    const file = fs.readFileSync(req.file.path);
+    console.log('file', file);
+    
+    const upload = new Upload({
         client: s3Client,
         params: {
             Bucket: process.env.S3_BUCKET_NAME,
             Key: `${req.body.username}-profileImg`,
-            Body: req.file,
+            Body: file,
+            ContentType: req.file.mimetype,
         },
         queueSize: 4,
         partSize: 1024 * 1024 * 5,
         leavePartsOnError: false,
       });
     
-    const fileRes = await parallelUploads3.done();
+    const fileRes = await upload.done();
+    fs.unlink(req.file.path, () => {});
 
-    user.imageUrl = fileRes.Location;
-    await user.save();
+    const user = await Users.create({
+        ...req.body,
+        role: 'attendee',
+        imageUrl: fileRes.Location
+    });
 
     res.send({ user });
 };
