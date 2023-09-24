@@ -1,22 +1,24 @@
 TODOs:
 
-- multi col unique constraint on EventAttendees
-- openApi?
+
+- integrate with cognito
+- Lambda and SNS for email verify
+- deploy frontend on s3
+- deploy frontend on amplify
+- deploy api on beanstalk
+    - integrate KMS or secrets manager
+- ci/cd with code deploy/code build
+
 - build frontend
     - double check desktop doesn't look like trash
 - write all endpoints
     - events to be ordered
-- integrate with cognito
-- deploy api on beanstalk
-    - integrate KMS or secrets manager
-- deploy frontend on s3
 - mess around with cloud watch
-- deploy frontend on amplify
 - put api behind api gateway
 - add elasticache to db
 - move 1 endpoint to lambda (test performance before and after)
 - mess around with cloud watch
-- ci/cd with code deploy/code build
 - fix api to use role instead of main aws user's keys/perms
 - multer not saving files locally right?
-
+- multi col unique constraint on EventAttendees
+- openApi?

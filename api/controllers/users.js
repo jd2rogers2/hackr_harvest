@@ -2,19 +2,24 @@ const { GetObjectCommand, PutObjectCommand, S3Client } = require('@aws-sdk/clien
 const { Op } = require("sequelize");
 const fs = require('fs');
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+const { CognitoIdentityProviderClient, SignUpCommand } = require("@aws-sdk/client-cognito-identity-provider");
 
 const { Users } = require('../models');
 
 
 const region = 'us-west-2';
-const Bucket = process.env.S3_BUCKET_NAME;
-const s3Client = new S3Client({
+const clientConfig = {
     credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     },
     region,
-});
+};
+
+const cognitoClient = new CognitoIdentityProviderClient({ region });
+
+const Bucket = process.env.S3_BUCKET_NAME;
+const s3Client = new S3Client(clientConfig);
 
 
 const findDupUserErrors = async ({ email, username }) => {
@@ -43,7 +48,7 @@ const createUser = async (req, res) => {
     if (!isAllowedFileType(req.file.mimetype)) {
         return res.status(400).send('profile image file type not allowed');
     }
-    
+
     const file = fs.readFileSync(req.file.path);
     const Key = `${req.body.username}-profileImg`;
     const command = new PutObjectCommand({
@@ -61,8 +66,18 @@ const createUser = async (req, res) => {
         imageUrl: `https://${Bucket}.s3.${region}.amazonaws.com/${Key}`,
     });
 
-    const command2 = new GetObjectCommand({ Bucket, Key });
-    const signed = await getSignedUrl(s3Client, command2, { expiresIn: 3600 });
+    const command2 = new SignUpCommand({
+        ClientId: process.env.COGNITO_CLIENT_ID,
+        SecretHash: process.env.COGNITO_SECRET_HASH,
+        Username: req.body.username,
+        Password: req.body.password,
+        // UserAttributes: [{ Name: "email", Value: email }],
+    });
+    const res2 = await cognitoClient.send(command2);
+    console.log('cognito res2', res2)
+
+    const command3 = new GetObjectCommand({ Bucket, Key });
+    const signed = await getSignedUrl(s3Client, command3, { expiresIn: 3600 });
     user.imageUrl = signed;
 
     res.send({ user });
