@@ -1,17 +1,19 @@
-const { Upload } = require('@aws-sdk/lib-storage');
-const { S3Client } = require('@aws-sdk/client-s3');
+const { GetObjectCommand, PutObjectCommand, S3Client } = require('@aws-sdk/client-s3');
 const { Op } = require("sequelize");
 const fs = require('fs');
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
 const { Users } = require('../models');
 
 
+const region = 'us-west-2';
+const Bucket = process.env.S3_BUCKET_NAME;
 const s3Client = new S3Client({
     credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     },
-    region: 'us-west-2',
+    region,
 });
 
 
@@ -41,31 +43,27 @@ const createUser = async (req, res) => {
     if (!isAllowedFileType(req.file.mimetype)) {
         return res.status(400).send('profile image file type not allowed');
     }
-    console.log('req.file', req.file);
+    
     const file = fs.readFileSync(req.file.path);
-    console.log('file', file);
-    
-    const upload = new Upload({
-        client: s3Client,
-        params: {
-            Bucket: process.env.S3_BUCKET_NAME,
-            Key: `${req.body.username}-profileImg`,
-            Body: file,
-            ContentType: req.file.mimetype,
-        },
-        queueSize: 4,
-        partSize: 1024 * 1024 * 5,
-        leavePartsOnError: false,
-      });
-    
-    const fileRes = await upload.done();
+    const Key = `${req.body.username}-profileImg`;
+    const command = new PutObjectCommand({
+        Bucket,
+        Key,
+        Body: file,
+        ContentType: req.file.mimetype,
+    });
+    await s3Client.send(command);
     fs.unlink(req.file.path, () => {});
 
     const user = await Users.create({
         ...req.body,
         role: 'attendee',
-        imageUrl: fileRes.Location
+        imageUrl: `https://${Bucket}.s3.${region}.amazonaws.com/${Key}`,
     });
+
+    const command2 = new GetObjectCommand({ Bucket, Key });
+    const signed = await getSignedUrl(s3Client, command2, { expiresIn: 3600 });
+    user.imageUrl = signed;
 
     res.send({ user });
 };

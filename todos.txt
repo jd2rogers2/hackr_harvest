@@ -7,7 +7,6 @@ TODOs:
 - write all endpoints
     - events to be ordered
 - integrate with cognito
-- integrate imgs w/ s3
 - deploy api on beanstalk
     - integrate KMS or secrets manager
 - deploy frontend on s3
@@ -18,6 +17,6 @@ TODOs:
 - move 1 endpoint to lambda (test performance before and after)
 - mess around with cloud watch
 - ci/cd with code deploy/code build
-- private s3 bucket, fix api to use role instead of main aws user's keys/perms
+- fix api to use role instead of main aws user's keys/perms
 - multer not saving files locally right?
 
