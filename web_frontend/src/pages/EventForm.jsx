@@ -19,16 +19,25 @@ function EventForm() {
     const handleInputChange = (e) => {
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value,
+            [e.target.name]: e.target.name === 'imageUrl' ? e.target.files[0] : e.target.value,
         })
     }
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
+
+        const FORMatted = new FormData();
+        for (let key in formData) {
+            if (key === 'imageUrl') {
+                FORMatted.append('file', formData[key]);
+            } else {
+                FORMatted.append(key, formData[key]);
+            }
+        }
+
         const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/events`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formData),
+            body: FORMatted,
         });
         const event = await res.json();
         navigate(`/events/${event.id}`);
@@ -71,13 +80,12 @@ function EventForm() {
                     />
                 </Form.Group>
                 <Form.Group className="mb-3">
-                    <Form.Label>imageUrl</Form.Label>
-                    <Form.Control
-                        onChange={handleInputChange}
-                        type="text"
+                    <label htmlFor="imageUrl">imageUrl</label>
+                    <input
+                        type="file"
                         id="imageUrl"
                         name="imageUrl"
-                        value={formData.imageUrl || ''}
+                        onChange={handleInputChange}
                     />
                 </Form.Group>
                 <label htmlFor="startTime">startTime</label>
