@@ -39,7 +39,7 @@ function EventForm() {
             method: "POST",
             body: FORMatted,
         });
-        const event = await res.json();
+        const { event } = await res.json();
         navigate(`/events/${event.id}`);
     }
 

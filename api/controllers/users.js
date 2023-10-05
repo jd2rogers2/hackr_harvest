@@ -1,25 +1,18 @@
-const { GetObjectCommand, PutObjectCommand, S3Client } = require('@aws-sdk/client-s3');
+const { GetObjectCommand, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { Op } = require("sequelize");
 const fs = require('fs');
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { CognitoIdentityProviderClient, SignUpCommand } = require("@aws-sdk/client-cognito-identity-provider");
 
 const { Users } = require('../models');
+const { awsRegion } = require('../static');
+const { s3Client } = require('../clients/s3');
+const { isAllowedFileType } = require('../helpers');
 
 
-const region = 'us-west-2';
-const clientConfig = {
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    },
-    region,
-};
-
-const cognitoClient = new CognitoIdentityProviderClient({ region });
+const cognitoClient = new CognitoIdentityProviderClient({ region: awsRegion });
 
 const Bucket = process.env.S3_BUCKET_NAME;
-const s3Client = new S3Client(clientConfig);
 
 
 const findDupUserErrors = async ({ email, username }) => {
@@ -32,10 +25,6 @@ const findDupUserErrors = async ({ email, username }) => {
         existing.push('username already exists')
     }
     return existing;
-}
-
-const isAllowedFileType = fileType => {
-    return fileType === 'image/jpeg' || fileType === 'image/jpg' || fileType === 'image/png';
 }
 
 
@@ -63,7 +52,7 @@ const createUser = async (req, res) => {
     const user = await Users.create({
         ...req.body,
         role: 'attendee',
-        imageUrl: `https://${Bucket}.s3.${region}.amazonaws.com/${Key}`,
+        imageUrl: `https://${Bucket}.s3.${awsRegion}.amazonaws.com/${Key}`,
     });
 
     const command2 = new SignUpCommand({

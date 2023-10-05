@@ -28,7 +28,7 @@ function EventCard({ event }) {
         <Container fluid style={{ paddingBottom: '10px' }} onClick={handleEventCardClick}>
             <Row>
                 <Col xs={{ span: 2 }}>
-                    <img src={event.imageUrl} alt="the event's img" />
+                    <img src={event.imageUrl} alt="the event's img" style={{ maxWidth: '100%' }} />
                 </Col>
                 <Col xs={{ span: 6 }}>
                     <Container>

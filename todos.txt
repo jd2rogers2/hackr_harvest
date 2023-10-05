@@ -22,3 +22,4 @@ TODOs:
 - multer not saving files locally right?
 - multi col unique constraint on EventAttendees
 - openApi?
+- make event names unique
