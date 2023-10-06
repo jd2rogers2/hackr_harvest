@@ -34,40 +34,46 @@ const createUser = async (req, res) => {
         return res.status(400).send(dupUserErrors.join(', '));
     }
 
-    if (!isAllowedFileType(req.file.mimetype)) {
-        return res.status(400).send('profile image file type not allowed');
-    }
+    let imageUrl = null;
+    let signedImageUrl = null;
+    if (req.file) {
+        if (!isAllowedFileType(req.file.mimetype)) {
+            return res.status(400).send('profile image file type not allowed');
+        }
 
-    const file = fs.readFileSync(req.file.path);
-    const Key = `${req.body.username}-profileImg`;
-    const command = new PutObjectCommand({
-        Bucket,
-        Key,
-        Body: file,
-        ContentType: req.file.mimetype,
-    });
-    await s3Client.send(command);
-    fs.unlink(req.file.path, () => {});
+        const Key = `${req.body.username}-profileImg`;
+        const file = fs.readFileSync(req.file.path);
+        const command = new PutObjectCommand({
+            Bucket,
+            Key,
+            Body: file,
+            ContentType: req.file.mimetype,
+        });
+        await s3Client.send(command);
+        fs.unlink(req.file.path, () => {});
+
+        const command3 = new GetObjectCommand({ Bucket, Key });
+        imageUrl = `https://${Bucket}.s3.${awsRegion}.amazonaws.com/${Key}`
+        signedImageUrl = await getSignedUrl(s3Client, command3, { expiresIn: 3600 });
+    }
 
     const user = await Users.create({
         ...req.body,
         role: 'attendee',
-        imageUrl: `https://${Bucket}.s3.${awsRegion}.amazonaws.com/${Key}`,
+        // below is not the signed url but should be the permanent reisdence of our s3 object
+        imageUrl,
     });
 
     const command2 = new SignUpCommand({
         ClientId: process.env.COGNITO_CLIENT_ID,
-        SecretHash: process.env.COGNITO_SECRET_HASH,
-        Username: req.body.username,
+        Username: req.body.email,
         Password: req.body.password,
-        // UserAttributes: [{ Name: "email", Value: email }],
+        // UserAttributes: [{ Name: "email", Value: req.body.email }],
     });
     const res2 = await cognitoClient.send(command2);
     console.log('cognito res2', res2)
 
-    const command3 = new GetObjectCommand({ Bucket, Key });
-    const signed = await getSignedUrl(s3Client, command3, { expiresIn: 3600 });
-    user.imageUrl = signed;
+    user.imageUrl = signedImageUrl;
 
     res.send({ user });
 };

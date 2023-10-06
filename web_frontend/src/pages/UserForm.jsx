@@ -3,8 +3,23 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import Nav from 'react-bootstrap/Nav';
 import Button from 'react-bootstrap/Button';
+import { object, string  } from 'yup';
 
 import { Header } from '../components';
+
+
+const userSchema = object({
+    username: string().required(),
+    password: string().required().min(8)
+        .matches(/[A-Z]+/) // incl upper
+        .matches(/[a-z]+/) // incl lower
+        // .matches(new RegExp("[\^\$\*\.\[\]{}()?\-\"!@#%&\/\\,><':;|_~`+=]+")) // incl special char
+        .matches(/\d+/), // incl number
+    email: string().email().required(),
+    imageUrl: string().optional(),
+    tagline: string().optional(),
+    city: string().optional(),
+});
 
 
 function UserForm() {
@@ -15,12 +30,20 @@ function UserForm() {
     // set user into formData to start for edit forms
     const [formData, setFormData] = useState({});
     const [toggleKey, setToggleKey] = useState('Sign Up');
+    const [passwordError, setPasswordError] = useState(false);
 
-    const handleInputChange = (e) => {
+    const handleInputChange = async (e) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.name === 'imageUrl' ? e.target.files[0] : e.target.value,
-        })
+        });
+
+        if (e.target.name === 'password') {
+            try {
+                await userSchema.validate(formData);
+                setPasswordError(false);
+            } catch {}
+        }
     }
 
     const handleFormToggle = (e) => {
@@ -29,6 +52,17 @@ function UserForm() {
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
+
+        try {
+            await userSchema.validate(formData);
+        } catch(e) {
+            console.log(formData)
+            console.log(e)
+            if (e.message.includes('password')) {
+                setPasswordError(true);
+                return;
+            }
+        }
 
         const FORMatted = new FormData();
         for (let key in formData) {
@@ -73,7 +107,7 @@ function UserForm() {
             )}
             <Form onSubmit={handleFormSubmit} style={{ margin: '20px 10%' }}>
                 <Form.Group className="mb-3">
-                    <Form.Label>email</Form.Label>
+                    <Form.Label>email*</Form.Label>
                     <Form.Control
                         onChange={handleInputChange}
                         type="email"
@@ -83,7 +117,7 @@ function UserForm() {
                     />
                 </Form.Group>
                 <Form.Group className="mb-3">
-                    <Form.Label>password</Form.Label>
+                    <Form.Label>password*</Form.Label>
                     <Form.Control
                         onChange={handleInputChange}
                         type="password"
@@ -92,11 +126,16 @@ function UserForm() {
                         value={formData.password || ''}
                         placeholder="better be a good one"
                     />
+                    {passwordError && (
+                        <Form.Text className="text-muted">
+                            {"Password must be 8 chars long with: one upper case, one lowercase, one digit, and one special character (^$*.[]{}()?-\"!@#%&/\\,><':;|_~`+=)"}
+                        </Form.Text>
+                    )}
                 </Form.Group>
                 {(toggleKey === 'Sign Up' || user) && (
                     <>
                         <Form.Group className="mb-3">
-                            <Form.Label>username</Form.Label>
+                            <Form.Label>username*</Form.Label>
                             <Form.Control
                                 onChange={handleInputChange}
                                 type="text"
