@@ -2,7 +2,11 @@ const { GetObjectCommand, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { Op } = require("sequelize");
 const fs = require('fs');
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
-const { CognitoIdentityProviderClient, SignUpCommand } = require("@aws-sdk/client-cognito-identity-provider");
+const {
+    CognitoIdentityProviderClient,
+    SignUpCommand,
+    ConfirmSignUpCommand,
+} = require("@aws-sdk/client-cognito-identity-provider");
 
 const { Users } = require('../models');
 const { awsRegion } = require('../static');
@@ -68,21 +72,38 @@ const createUser = async (req, res) => {
         ClientId: process.env.COGNITO_CLIENT_ID,
         Username: req.body.email,
         Password: req.body.password,
-        // UserAttributes: [{ Name: "email", Value: req.body.email }],
     });
-    const res2 = await cognitoClient.send(command2);
-    console.log('cognito res2', res2)
+
+    try {
+        await cognitoClient.send(command2);
+    } catch (e) {
+        await Users.destroy({ where: { email: user.email } });
+        return res.status(502).send('AWS user service failure');
+    }
 
     user.imageUrl = signedImageUrl;
 
     res.send({ user });
 };
 
+const verifyEmail = async (req, res) => {
+    const command = new ConfirmSignUpCommand({
+        ClientId: process.env.COGNITO_CLIENT_ID,
+        Username: req.body.email,
+        ConfirmationCode: req.body.verifyCode,
+    });
+    await cognitoClient.send(command);
+
+    res.send();
+};
+
 const signIn = async (req, res) => {
     res.send();
 };
 
-// verfiy email?? lambda?!
+const resetPassword = async (req, res) => {
+    res.send();
+};
 
 const signOut = async (req, res) => {
     res.send();
@@ -103,6 +124,8 @@ module.exports = {
     createUser,
     signIn,
     signOut,
+    verifyEmail,
+    resetPassword,
     getUserById,
     updateUser,
 };

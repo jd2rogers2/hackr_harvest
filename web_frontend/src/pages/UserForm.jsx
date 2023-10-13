@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import Nav from 'react-bootstrap/Nav';
 import Button from 'react-bootstrap/Button';
@@ -25,11 +25,12 @@ const userSchema = object({
 function UserForm() {
     const navigate = useNavigate();
     const { userId } = useParams();
+    const location = useLocation();
+    const authPageKey = location.pathname.includes('signup') ? 'signup' : 'signin';
     const user = null;
 
     // set user into formData to start for edit forms
     const [formData, setFormData] = useState({});
-    const [toggleKey, setToggleKey] = useState('Sign Up');
     const [passwordError, setPasswordError] = useState(false);
 
     const handleInputChange = async (e) => {
@@ -47,7 +48,8 @@ function UserForm() {
     }
 
     const handleFormToggle = (e) => {
-        setToggleKey(e.target.text);
+        const isSignUp = e.target.text === 'Sign Up';
+        navigate(`/users/${isSignUp ? 'signup' : 'signin'}`)
     }
 
     const handleFormSubmit = async (e) => {
@@ -56,8 +58,6 @@ function UserForm() {
         try {
             await userSchema.validate(formData);
         } catch(e) {
-            console.log(formData)
-            console.log(e)
             if (e.message.includes('password')) {
                 setPasswordError(true);
                 return;
@@ -76,13 +76,13 @@ function UserForm() {
         if (user) {
             // patch request
             navigate(`/users/${userId}`);
-        } else if (toggleKey === 'Sign Up') {
-            const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/users/signUp`, {
+        } else if (authPageKey === 'signup') {
+            const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/users/signup`, {
                 method: "POST",
                 body: FORMatted,
             });
             if (res.ok) {
-                // pop modal for "check your email"
+                navigate(`/users/verify?email=${formData.email}`);
             } else {
                 // display error
             }
@@ -96,12 +96,12 @@ function UserForm() {
         <>
             <Header />
             {!user && (
-                <Nav justify variant="tabs" activeKey={toggleKey}>
+                <Nav justify variant="tabs" activeKey={authPageKey}>
                     <Nav.Item>
-                      <Nav.Link onClick={handleFormToggle} eventKey="Sign Up">Sign Up</Nav.Link>
+                      <Nav.Link onClick={handleFormToggle} eventKey="signup">Sign Up</Nav.Link>
                     </Nav.Item>
                     <Nav.Item>
-                      <Nav.Link onClick={handleFormToggle} eventKey="Sign In">Sign In</Nav.Link>
+                      <Nav.Link onClick={handleFormToggle} eventKey="signin">Sign In</Nav.Link>
                     </Nav.Item>
                 </Nav>
             )}
@@ -132,7 +132,7 @@ function UserForm() {
                         </Form.Text>
                     )}
                 </Form.Group>
-                {(toggleKey === 'Sign Up' || user) && (
+                {(authPageKey === 'signup' || user) && (
                     <>
                         <Form.Group className="mb-3">
                             <Form.Label>username*</Form.Label>

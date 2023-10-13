@@ -47,7 +47,7 @@ function Header() {
                 <NavLink style={navLinkStyle} to="/users/userId">My Profile & Events</NavLink>
               </NavItem>
               <NavItem style={{ textAlign: 'right', paddingTop: '20px' }}>
-                <Button variant="primary" onClick={() => navigate('/users/auth')}>Sign In/Up</Button>
+                <Button variant="primary" onClick={() => navigate('/users/signup')}>Sign In/Up</Button>
               </NavItem>
             </Nav>
           </Offcanvas.Body>

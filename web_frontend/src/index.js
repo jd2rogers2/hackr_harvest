@@ -7,7 +7,14 @@ import {
   Navigate,
 } from "react-router-dom";
 
-import { UserForm, EventDisplay, EventForm, Home }  from './pages';
+import {
+  UserForm,
+  EventDisplay,
+  EventForm,
+  Home,
+  VerifyEmail,
+  ResetPassword,
+}  from './pages';
 
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -15,7 +22,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const router = createBrowserRouter([
   { path: "/home", element: <Home /> },
-  { path: "/users/auth", element: <UserForm /> },
+  { path: "/users/signup", element: <UserForm /> },
+  { path: "/users/signin", element: <UserForm /> },
+  { path: "/users/verify", element: <VerifyEmail /> },
+  { path: "/users/reset", element: <ResetPassword /> },
   // { path: "/users/:userId", element: <UserProfile /> },
   { path: "/users/:userId/update", element: <UserForm /> },
   { path: "/events/create", element: <EventForm /> },
