@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import Nav from 'react-bootstrap/Nav';
@@ -6,6 +6,7 @@ import Button from 'react-bootstrap/Button';
 import { object, string  } from 'yup';
 
 import { Header } from '../components';
+import { UserContext } from '../providers/UserProvider';
 
 
 const userSchema = object({
@@ -27,7 +28,7 @@ function UserForm() {
     const { userId } = useParams();
     const location = useLocation();
     const authPageKey = location.pathname.includes('signup') ? 'signup' : 'signin';
-    const user = null;
+    const { user, setUser } = useContext(UserContext);
 
     // set user into formData to start for edit forms
     const [formData, setFormData] = useState({});
@@ -87,8 +88,16 @@ function UserForm() {
                 // display error
             }
         } else {
-            // Sign In post req
-            navigate('/home');
+            const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/users/signin`, {
+                method: "POST",
+                body: JSON.stringify(formData),
+                headers: { 'Content-Type': 'application/json' },
+            });
+            if (res.ok) {
+                const { user } = await res.json();
+                setUser(user);
+                navigate('/home');
+            }
         }
     }
 

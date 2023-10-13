@@ -3,9 +3,11 @@ const { Op } = require("sequelize");
 const fs = require('fs');
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const {
+    AuthFlowType,
     CognitoIdentityProviderClient,
-    SignUpCommand,
     ConfirmSignUpCommand,
+    InitiateAuthCommand,
+    SignUpCommand,
 } = require("@aws-sdk/client-cognito-identity-provider");
 
 const { Users } = require('../models');
@@ -98,7 +100,27 @@ const verifyEmail = async (req, res) => {
 };
 
 const signIn = async (req, res) => {
-    res.send();
+    const command = new InitiateAuthCommand({
+        AuthFlow: AuthFlowType.USER_PASSWORD_AUTH,
+        AuthParameters: {
+           USERNAME: req.body.username,
+           PASSWORD: req.body.password,
+        },
+        ClientId: process.env.COGNITO_CLIENT_ID,
+    });
+
+    try {
+        const res = await cognitoClient.send(command);
+        const refreshToken = res.AuthenticationResult.RefreshToken;
+
+        res.cookie('hackr_harvest', refreshToken, {
+            signed: true,
+            expiresIn: 1 * 60 * 60 * 1000,
+            secure: true,
+        }).send();
+    } catch (e) {
+        res.status(400).send('auth failed');
+    }
 };
 
 const resetPassword = async (req, res) => {

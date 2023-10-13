@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+var cookieParser = require('cookie-parser');
 
 const { eventAttendeesRouter, eventsRouter, usersRouter } = require('./routes');
 
@@ -12,6 +13,7 @@ const app = express();
 
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(cookieParser(process.env.API_COOKIE_SECRET));
 
 app.use('/eventAttendees', eventAttendeesRouter);
 app.use('/events', eventsRouter);
