@@ -9,7 +9,7 @@ const {
     InitiateAuthCommand,
     SignUpCommand,
 } = require("@aws-sdk/client-cognito-identity-provider");
-const { createHmac } = require("crypto");
+const jwt = require('jsonwebtoken'); 
 
 const { Users } = require('../models');
 const { awsRegion } = require('../static');
@@ -71,14 +71,10 @@ const createUser = async (req, res) => {
         imageUrl,
     });
 
-    const hashedPw = createHmac('sha256', process.env.PW_HASH_SECRET)
-        .update(`${req.body.password}${process.env.COGNITO_CLIENT_ID}`)
-        .digest('base64');
-
     const command2 = new SignUpCommand({
         ClientId: process.env.COGNITO_CLIENT_ID,
         Username: req.body.email,
-        Password: hashedPw,
+        Password: req.body.password,
     });
 
     try {
@@ -105,36 +101,27 @@ const verifyEmail = async (req, res) => {
 };
 
 const signIn = async (req, res) => {
-    console.log('\n\n');
-    console.log('req.body', req.body);
-
-    const hashedPw = createHmac('sha256', process.env.PW_HASH_SECRET)
-        .update(`${req.body.password}${process.env.COGNITO_CLIENT_ID}`)
-        .digest('base64');
-
     const command = new InitiateAuthCommand({
-        AuthFlow: AuthFlowType.USER_SRP_AUTH,
+        AuthFlow: AuthFlowType.USER_PASSWORD_AUTH,
         AuthParameters: {
            USERNAME: req.body.email,
-           SRP_A: hashedPw,
+           PASSWORD: req.body.password,
         },
         ClientId: process.env.COGNITO_CLIENT_ID,
     });
 
     try {
-        const res = await cognitoClient.send(command);
-        const { AccessToken, ExpiresIn, RefreshToken } = res.AuthenticationResult;
+        const signInRes = await cognitoClient.send(command);
+        const { AccessToken, ExpiresIn, RefreshToken } = signInRes.AuthenticationResult;
 
-        console.log('cognito res', res);
-        console.log('\n\n');
-        const rdsUser = await Users.findOne({ where: { email: req.body.email } });
+        const rdsRes = await Users.findOne({ where: { email: req.body.email } });
         const user = {
-            ...rdsUser,
+            ...rdsRes.dataValues,
+            expiresInMs: ExpiresIn * 1000,
             token: AccessToken,
-            expiresIn: ExpiresIn,
             refreshToken: RefreshToken,
         };
-
+        
         if (user.imageUrl) {
             const Key = `${rdsUser.username}-profileImg`;
             const command2 = new GetObjectCommand({ Bucket, Key });
@@ -142,14 +129,16 @@ const signIn = async (req, res) => {
             user.imageUrl = signedImageUrl;
         }
 
-        res.cookie('hackr_harvest', user, {
+        // image and tokens could make jwt too big for cookie storage
+        const userJwt = jwt.sign({ id: user.id, refreshToken: RefreshToken }, process.env.JWT_SECRET);
+
+        res.cookie('hackr_harvest', userJwt, {
             signed: true,
-            expiresIn: 1 * 60 * 60 * 1000,
+            maxAge: ExpiresIn * 1000,
             secure: true,
+            // sameSite: 'None',
         }).send({ user });
     } catch (e) {
-        console.log('e', e);
-        console.log('\n\n');
         res.status(400).send('auth failed');
     }
 };
@@ -159,8 +148,7 @@ const resetPassword = async (req, res) => {
 };
 
 const signOut = async (req, res) => {
-    res.clearCookie('hackr_harvest');
-    res.send();
+    res.clearCookie('hackr_harvest').send();
 };
 
 const getUserById = async (req, res) => {
@@ -169,8 +157,14 @@ const getUserById = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
+    // need access token
     // hardcode attendee role
     res.send();
+};
+
+const getCurrent = async (req, res) => {
+    // need refresh token
+    res.status(404).send('uset not found');
 };
 
 
@@ -181,5 +175,6 @@ module.exports = {
     verifyEmail,
     resetPassword,
     getUserById,
+    getCurrent,
     updateUser,
 };

@@ -5,7 +5,9 @@ import NavItem from 'react-bootstrap/NavItem';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import Button from 'react-bootstrap/Button';
 import { NavLink, useNavigate } from "react-router-dom";
+import { useContext } from "react";
 
+import { UserContext } from "../providers/UserProvider";
 import logo from '../logo.svg';
 
 
@@ -19,6 +21,22 @@ const navLinkStyle = ({ isActive, isPending }) => ({
 
 function Header() {
   const navigate = useNavigate();
+  const { user, setUser } = useContext(UserContext);
+
+  const handleSignOutClick = async () => {
+    const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/users/signout`, {
+      method: 'POST',
+    });
+    if (res.ok) {
+      setUser(null);
+      navigate('/users/signup');
+    }
+  }
+
+  const handleSignUpInClick = () => {
+
+    navigate('/users/signup');
+  }
 
   return (
     <Navbar expand="lg" className="bg-body-tertiary mb-3">
@@ -43,12 +61,20 @@ function Header() {
               <NavItem style={{ textAlign: 'right', paddingTop: '20px' }}>
                 <NavLink style={navLinkStyle} to="/events">All Events</NavLink>
               </NavItem>
-              <NavItem style={{ textAlign: 'right', paddingTop: '20px' }}>
-                <NavLink style={navLinkStyle} to="/users/userId">My Profile & Events</NavLink>
-              </NavItem>
-              <NavItem style={{ textAlign: 'right', paddingTop: '20px' }}>
-                <Button variant="primary" onClick={() => navigate('/users/signup')}>Sign In/Up</Button>
-              </NavItem>
+              {user ? (
+                <>
+                  <NavItem style={{ textAlign: 'right', paddingTop: '20px' }}>
+                    <NavLink style={navLinkStyle} to={`/users/${user.id}`}>My Profile & Events</NavLink>
+                  </NavItem>
+                  <NavItem style={{ textAlign: 'right', paddingTop: '20px' }}>
+                    <Button variant="primary" onClick={handleSignOutClick}>Sign Out</Button>
+                  </NavItem>
+                </>
+              ) : (
+                <NavItem style={{ textAlign: 'right', paddingTop: '20px' }}>
+                  <Button variant="primary" onClick={handleSignUpInClick}>Sign In/Up</Button>
+                </NavItem>
+              )}
             </Nav>
           </Offcanvas.Body>
         </Navbar.Offcanvas>

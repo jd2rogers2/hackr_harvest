@@ -1,19 +1,20 @@
 const express = require('express');
 const cors = require('cors');
-var cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-parser');
 
 const { eventAttendeesRouter, eventsRouter, usersRouter } = require('./routes');
 
 
 let corsOptions = {
-  origin : ['http://localhost:3001'],
+  credentials: true,
+  origin: ['http://localhost:3001'],
 };
 
 const app = express();
 
 app.use(cors(corsOptions));
 app.use(express.json());
-app.use(cookieParser(process.env.API_COOKIE_SECRET));
+app.use(cookieParser(process.env.COOKIE_SECRET));
 
 app.use('/eventAttendees', eventAttendeesRouter);
 app.use('/events', eventsRouter);

@@ -25,7 +25,6 @@ const userSchema = object({
 
 function UserForm() {
     const navigate = useNavigate();
-    const { userId } = useParams();
     const location = useLocation();
     const authPageKey = location.pathname.includes('signup') ? 'signup' : 'signin';
     const { user, setUser } = useContext(UserContext);
@@ -75,12 +74,18 @@ function UserForm() {
         }
 
         if (user) {
-            // patch request
-            navigate(`/users/${userId}`);
+            const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/users/${user.id}`, {
+                method: 'PATCH',
+                body: JSON.stringify(formData),
+            });
+            if (res.ok) {
+                navigate(`/users/${user.id}`);
+            }
         } else if (authPageKey === 'signup') {
             const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/users/signup`, {
                 method: "POST",
                 body: FORMatted,
+                headers: { 'Content-Type': 'application/json' },
             });
             if (res.ok) {
                 navigate(`/users/verify?email=${formData.email}`);
@@ -92,6 +97,7 @@ function UserForm() {
                 method: "POST",
                 body: JSON.stringify(formData),
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
             });
             if (res.ok) {
                 const { user } = await res.json();
