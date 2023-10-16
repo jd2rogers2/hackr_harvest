@@ -54,10 +54,12 @@ const getEventById = async (req, res) => {
         return res.status(400).send('Event not found');
     }
 
-    const Key = `${event.name}-eventImg`;
-    const command = new GetObjectCommand({ Bucket, Key });
-    const signed = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
-    event.imageUrl = signed;
+    if (event.imageUrl) {
+        const Key = `${event.name}-eventImg`;
+        const command = new GetObjectCommand({ Bucket, Key });
+        const signed = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+        event.imageUrl = signed;
+    }
 
     res.send({ event });
 };
@@ -75,6 +77,8 @@ const getAllEvents = async (req, res) => {
     });
 
     const urls = await Promise.all(events.map(e => {
+        if (!e.imageUrl) { return; }
+
         const Key = `${e.name}-eventImg`;
         const command = new GetObjectCommand({ Bucket, Key });
         return getSignedUrl(s3Client, command, { expiresIn: 3600 });

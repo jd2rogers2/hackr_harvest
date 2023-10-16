@@ -9,6 +9,7 @@ const {
     InitiateAuthCommand,
     SignUpCommand,
 } = require("@aws-sdk/client-cognito-identity-provider");
+const { createHmac } = require("crypto");
 
 const { Users } = require('../models');
 const { awsRegion } = require('../static');
@@ -70,10 +71,14 @@ const createUser = async (req, res) => {
         imageUrl,
     });
 
+    const hashedPw = createHmac('sha256', process.env.PW_HASH_SECRET)
+        .update(`${req.body.password}${process.env.COGNITO_CLIENT_ID}`)
+        .digest('base64');
+
     const command2 = new SignUpCommand({
         ClientId: process.env.COGNITO_CLIENT_ID,
         Username: req.body.email,
-        Password: req.body.password,
+        Password: hashedPw,
     });
 
     try {
@@ -100,25 +105,51 @@ const verifyEmail = async (req, res) => {
 };
 
 const signIn = async (req, res) => {
+    console.log('\n\n');
+    console.log('req.body', req.body);
+
+    const hashedPw = createHmac('sha256', process.env.PW_HASH_SECRET)
+        .update(`${req.body.password}${process.env.COGNITO_CLIENT_ID}`)
+        .digest('base64');
+
     const command = new InitiateAuthCommand({
-        AuthFlow: AuthFlowType.USER_PASSWORD_AUTH,
+        AuthFlow: AuthFlowType.USER_SRP_AUTH,
         AuthParameters: {
-           USERNAME: req.body.username,
-           PASSWORD: req.body.password,
+           USERNAME: req.body.email,
+           SRP_A: hashedPw,
         },
         ClientId: process.env.COGNITO_CLIENT_ID,
     });
 
     try {
         const res = await cognitoClient.send(command);
-        const refreshToken = res.AuthenticationResult.RefreshToken;
+        const { AccessToken, ExpiresIn, RefreshToken } = res.AuthenticationResult;
 
-        res.cookie('hackr_harvest', refreshToken, {
+        console.log('cognito res', res);
+        console.log('\n\n');
+        const rdsUser = await Users.findOne({ where: { email: req.body.email } });
+        const user = {
+            ...rdsUser,
+            token: AccessToken,
+            expiresIn: ExpiresIn,
+            refreshToken: RefreshToken,
+        };
+
+        if (user.imageUrl) {
+            const Key = `${rdsUser.username}-profileImg`;
+            const command2 = new GetObjectCommand({ Bucket, Key });
+            const signedImageUrl = await getSignedUrl(s3Client, command2, { expiresIn: 3600 });
+            user.imageUrl = signedImageUrl;
+        }
+
+        res.cookie('hackr_harvest', user, {
             signed: true,
             expiresIn: 1 * 60 * 60 * 1000,
             secure: true,
-        }).send();
+        }).send({ user });
     } catch (e) {
+        console.log('e', e);
+        console.log('\n\n');
         res.status(400).send('auth failed');
     }
 };
@@ -128,6 +159,7 @@ const resetPassword = async (req, res) => {
 };
 
 const signOut = async (req, res) => {
+    res.clearCookie('hackr_harvest');
     res.send();
 };
 
