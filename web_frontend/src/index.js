@@ -12,6 +12,7 @@ import {
   EventDisplay,
   EventForm,
   Home,
+  Profile,
   VerifyEmail,
   ResetPassword,
 }  from './pages';
@@ -27,7 +28,7 @@ const router = createBrowserRouter([
   { path: "/users/signin", element: <UserForm /> },
   { path: "/users/verify", element: <VerifyEmail /> },
   { path: "/users/reset", element: <ResetPassword /> },
-  // { path: "/users/:userId", element: <UserProfile /> },
+  { path: "/users/:userId", element: <Profile /> },
   { path: "/users/:userId/update", element: <UserForm /> },
   { path: "/events/create", element: <EventForm /> },
   { path: "/events/:eventId", element: <EventDisplay /> },

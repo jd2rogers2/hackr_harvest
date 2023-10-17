@@ -4,6 +4,8 @@ import EventForm from './EventForm';
 import Home from './Home';
 import ResetPassword from './ResetPassword';
 import VerifyEmail from './VerifyEmail';
+import Profile from './Profile';
+import Events from './Events';
 
 export {
     UserForm,
@@ -11,5 +13,7 @@ export {
     EventForm,
     Home,
     VerifyEmail,
+    Profile,
+    Events,
     ResetPassword,
 };

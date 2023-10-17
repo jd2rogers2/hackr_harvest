@@ -1,18 +1,19 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 
 import { Header } from '../components';
+import { UserContext } from '../providers/UserProvider';
 
 
 function EventForm() {
     const navigate = useNavigate();
-    const user = null;
+    const { user } = useContext(UserContext);
 
-    // if (user?.role !== "admin") {
-    //     navigate('/home');
-    // }
+    if (user?.role !== "admin") {
+        navigate('/home');
+    }
 
     const [formData, setFormData] = useState({});
 

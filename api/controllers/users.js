@@ -119,7 +119,6 @@ const signIn = async (req, res) => {
             ...rdsRes.dataValues,
             expiresInMs: ExpiresIn * 1000,
             token: AccessToken,
-            refreshToken: RefreshToken,
         };
 
         if (user.imageUrl) {
@@ -134,7 +133,7 @@ const signIn = async (req, res) => {
 
         res.cookie('hackr_harvest', userJwt, {
             signed: true,
-            maxAge: ExpiresIn * 1000,
+            maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
             secure: true,
             // sameSite: 'None',
         }).send({ user });
@@ -152,7 +151,16 @@ const signOut = async (req, res) => {
 };
 
 const getUserById = async (req, res) => {
-    const user = await Users.find();
+    const { userId } = req.params;
+    const { dataValues: user } = await Users.findOne({ where: { id: userId } });
+
+    if (user.imageUrl) {
+        const Key = `${user.username}-profileImg`;
+        const command2 = new GetObjectCommand({ Bucket, Key });
+        const signedImageUrl = await getSignedUrl(s3Client, command2, { expiresIn: 3600 });
+        user.imageUrl = signedImageUrl;
+    }
+
     res.send({ user });
 };
 
@@ -169,9 +177,7 @@ const getCurrent = async (req, res) => {
     }
 
     const { id: userId, refreshToken } = jwt.verify(cookie, process.env.JWT_SECRET);
-    console.log('\n\n')
-    console.log('refreshToken', refreshToken)
-    console.log('\n\n')
+
     const command = new InitiateAuthCommand({
         AuthFlow: AuthFlowType.REFRESH_TOKEN_AUTH,
         AuthParameters: {
@@ -182,14 +188,13 @@ const getCurrent = async (req, res) => {
 
     try {
         const signInRes = await cognitoClient.send(command);
-        const { AccessToken, ExpiresIn, RefreshToken } = signInRes.AuthenticationResult;
+        const { AccessToken, ExpiresIn } = signInRes.AuthenticationResult;
 
         const rdsRes = await Users.findOne({ where: { id: userId } });
         const user = {
             ...rdsRes.dataValues,
             expiresInMs: ExpiresIn * 1000,
             token: AccessToken,
-            refreshToken: RefreshToken,
         };
 
         if (user.imageUrl) {
@@ -199,19 +204,8 @@ const getCurrent = async (req, res) => {
             user.imageUrl = signedImageUrl;
         }
 
-        // image and tokens could make jwt too big for cookie storage
-        const userJwt = jwt.sign({ id: user.id, refreshToken: RefreshToken }, process.env.JWT_SECRET);
-
-        res.cookie('hackr_harvest', userJwt, {
-            signed: true,
-            maxAge: ExpiresIn * 1000,
-            secure: true,
-            // sameSite: 'None',
-        }).send({ user });
+        res.send({ user });
     } catch (e) {
-        console.log('\n\n')
-        console.log('e', e)
-        console.log('\n\n')
         res.status(404).send('user not found');
     }
 };
