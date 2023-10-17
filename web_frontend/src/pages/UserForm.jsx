@@ -77,6 +77,7 @@ function UserForm() {
             const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/users/${user.id}`, {
                 method: 'PATCH',
                 body: JSON.stringify(formData),
+                headers: { 'Content-Type': 'application/json' },
             });
             if (res.ok) {
                 navigate(`/users/${user.id}`);
@@ -85,7 +86,6 @@ function UserForm() {
             const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/users/signup`, {
                 method: "POST",
                 body: FORMatted,
-                headers: { 'Content-Type': 'application/json' },
             });
             if (res.ok) {
                 navigate(`/users/verify?email=${formData.email}`);

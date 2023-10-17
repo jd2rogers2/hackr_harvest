@@ -9,7 +9,7 @@ const {
     InitiateAuthCommand,
     SignUpCommand,
 } = require("@aws-sdk/client-cognito-identity-provider");
-const jwt = require('jsonwebtoken'); 
+const jwt = require('jsonwebtoken');
 
 const { Users } = require('../models');
 const { awsRegion } = require('../static');
@@ -121,9 +121,9 @@ const signIn = async (req, res) => {
             token: AccessToken,
             refreshToken: RefreshToken,
         };
-        
+
         if (user.imageUrl) {
-            const Key = `${rdsUser.username}-profileImg`;
+            const Key = `${user.username}-profileImg`;
             const command2 = new GetObjectCommand({ Bucket, Key });
             const signedImageUrl = await getSignedUrl(s3Client, command2, { expiresIn: 3600 });
             user.imageUrl = signedImageUrl;
@@ -163,8 +163,57 @@ const updateUser = async (req, res) => {
 };
 
 const getCurrent = async (req, res) => {
-    // need refresh token
-    res.status(404).send('uset not found');
+    const cookie = req.signedCookies.hackr_harvest;
+    if (!cookie) {
+        return res.status(404).send('user not found');
+    }
+
+    const { id: userId, refreshToken } = jwt.verify(cookie, process.env.JWT_SECRET);
+    console.log('\n\n')
+    console.log('refreshToken', refreshToken)
+    console.log('\n\n')
+    const command = new InitiateAuthCommand({
+        AuthFlow: AuthFlowType.REFRESH_TOKEN_AUTH,
+        AuthParameters: {
+           REFRESH_TOKEN: refreshToken,
+        },
+        ClientId: process.env.COGNITO_CLIENT_ID,
+    });
+
+    try {
+        const signInRes = await cognitoClient.send(command);
+        const { AccessToken, ExpiresIn, RefreshToken } = signInRes.AuthenticationResult;
+
+        const rdsRes = await Users.findOne({ where: { id: userId } });
+        const user = {
+            ...rdsRes.dataValues,
+            expiresInMs: ExpiresIn * 1000,
+            token: AccessToken,
+            refreshToken: RefreshToken,
+        };
+
+        if (user.imageUrl) {
+            const Key = `${user.username}-profileImg`;
+            const command2 = new GetObjectCommand({ Bucket, Key });
+            const signedImageUrl = await getSignedUrl(s3Client, command2, { expiresIn: 3600 });
+            user.imageUrl = signedImageUrl;
+        }
+
+        // image and tokens could make jwt too big for cookie storage
+        const userJwt = jwt.sign({ id: user.id, refreshToken: RefreshToken }, process.env.JWT_SECRET);
+
+        res.cookie('hackr_harvest', userJwt, {
+            signed: true,
+            maxAge: ExpiresIn * 1000,
+            secure: true,
+            // sameSite: 'None',
+        }).send({ user });
+    } catch (e) {
+        console.log('\n\n')
+        console.log('e', e)
+        console.log('\n\n')
+        res.status(404).send('user not found');
+    }
 };
 
 
