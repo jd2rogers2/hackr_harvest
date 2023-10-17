@@ -100,48 +100,40 @@ const verifyEmail = async (req, res) => {
     res.send();
 };
 
-const signIn = async (req, res) => {
-    const command = new InitiateAuthCommand({
-        AuthFlow: AuthFlowType.USER_PASSWORD_AUTH,
-        AuthParameters: {
-           USERNAME: req.body.email,
-           PASSWORD: req.body.password,
-        },
-        ClientId: process.env.COGNITO_CLIENT_ID,
-    });
+// const signIn = async (req, res) => {
 
-    try {
-        const signInRes = await cognitoClient.send(command);
-        const { AccessToken, ExpiresIn, RefreshToken } = signInRes.AuthenticationResult;
 
-        const rdsRes = await Users.findOne({ where: { email: req.body.email } });
-        const user = {
-            ...rdsRes.dataValues,
-            expiresInMs: ExpiresIn * 1000,
-            token: AccessToken,
-            refreshToken: RefreshToken,
-        };
+//     try {
+//         const signInRes = await cognitoClient.send(command);
+//         const { AccessToken, ExpiresIn, RefreshToken } = signInRes.AuthenticationResult;
 
-        if (user.imageUrl) {
-            const Key = `${user.username}-profileImg`;
-            const command2 = new GetObjectCommand({ Bucket, Key });
-            const signedImageUrl = await getSignedUrl(s3Client, command2, { expiresIn: 3600 });
-            user.imageUrl = signedImageUrl;
-        }
+//         const user = {
+//             ...rdsRes.dataValues,
+//             expiresInMs: ExpiresIn * 1000,
+//             token: AccessToken,
+//             refreshToken: RefreshToken,
+//         };
 
-        // image and tokens could make jwt too big for cookie storage
-        const userJwt = jwt.sign({ id: user.id, refreshToken: RefreshToken }, process.env.JWT_SECRET);
+//         if (user.imageUrl) {
+//             const Key = `${user.username}-profileImg`;
+//             const command2 = new GetObjectCommand({ Bucket, Key });
+//             const signedImageUrl = await getSignedUrl(s3Client, command2, { expiresIn: 3600 });
+//             user.imageUrl = signedImageUrl;
+//         }
 
-        res.cookie('hackr_harvest', userJwt, {
-            signed: true,
-            maxAge: ExpiresIn * 1000,
-            secure: true,
-            // sameSite: 'None',
-        }).send({ user });
-    } catch (e) {
-        res.status(400).send('auth failed');
-    }
-};
+//         // image and tokens could make jwt too big for cookie storage
+//         const userJwt = jwt.sign({ id: user.id, refreshToken: RefreshToken }, process.env.JWT_SECRET);
+
+//         res.cookie('hackr_harvest', userJwt, {
+//             signed: true,
+//             maxAge: ExpiresIn * 1000,
+//             secure: true,
+//             // sameSite: 'None',
+//         }).send({ user });
+//     } catch (e) {
+//         res.status(400).send('auth failed');
+//     }
+// };
 
 const resetPassword = async (req, res) => {
     res.send();
@@ -164,27 +156,40 @@ const updateUser = async (req, res) => {
 
 const getCurrent = async (req, res) => {
     const cookie = req.signedCookies.hackr_harvest;
-    if (!cookie) {
+    if (!cookie && !req.body.email) {
         return res.status(404).send('user not found');
     }
 
-    const { id: userId, refreshToken } = jwt.verify(cookie, process.env.JWT_SECRET);
+    const isCookieAuth = Boolean(cookie && !req.body.email);
+    const { id: userId, refreshToken } = cookie ? jwt.verify(cookie, process.env.JWT_SECRET) : {};
+
     console.log('\n\n')
-    console.log('refreshToken', refreshToken)
+    console.log('cookie', cookie)
+    console.log('isCookieAuth', isCookieAuth)
+    console.log('refreshToken incoming', refreshToken)
     console.log('\n\n')
+
     const command = new InitiateAuthCommand({
-        AuthFlow: AuthFlowType.REFRESH_TOKEN_AUTH,
-        AuthParameters: {
-           REFRESH_TOKEN: refreshToken,
+        AuthFlow: isCookieAuth ? AuthFlowType.REFRESH_TOKEN_AUTH : AuthFlowType.USER_PASSWORD_AUTH,
+        AuthParameters: isCookieAuth ? {
+            REFRESH_TOKEN: refreshToken,
+        } : {
+            USERNAME: req.body.email,
+            PASSWORD: req.body.password,
         },
         ClientId: process.env.COGNITO_CLIENT_ID,
     });
 
     try {
-        const signInRes = await cognitoClient.send(command);
-        const { AccessToken, ExpiresIn, RefreshToken } = signInRes.AuthenticationResult;
+        const cognitoRes = await cognitoClient.send(command);
+        console.log('\n\n')
+        console.log('cognitoRes', cognitoRes)
+        console.log('\n\n')
+        const { AccessToken, ExpiresIn, RefreshToken } = cognitoRes.AuthenticationResult;
 
-        const rdsRes = await Users.findOne({ where: { id: userId } });
+        const rdsRes = await Users.findOne({
+            where: (isCookieAuth ? { id: userId } : { email: req.body.email })
+        });
         const user = {
             ...rdsRes.dataValues,
             expiresInMs: ExpiresIn * 1000,
@@ -198,6 +203,10 @@ const getCurrent = async (req, res) => {
             const signedImageUrl = await getSignedUrl(s3Client, command2, { expiresIn: 3600 });
             user.imageUrl = signedImageUrl;
         }
+
+        console.log('\n\n')
+        console.log('RefreshToken outgoing', RefreshToken)
+        console.log('\n\n')
 
         // image and tokens could make jwt too big for cookie storage
         const userJwt = jwt.sign({ id: user.id, refreshToken: RefreshToken }, process.env.JWT_SECRET);
@@ -219,7 +228,6 @@ const getCurrent = async (req, res) => {
 
 module.exports = {
     createUser,
-    signIn,
     signOut,
     verifyEmail,
     resetPassword,
