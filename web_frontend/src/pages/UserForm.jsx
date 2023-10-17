@@ -27,7 +27,7 @@ function UserForm() {
     const navigate = useNavigate();
     const location = useLocation();
     const authPageKey = location.pathname.includes('signup') ? 'signup' : 'signin';
-    const { user, signIn } = useContext(UserContext);
+    const { user, setUser } = useContext(UserContext);
 
     // set user into formData to start for edit forms
     const [formData, setFormData] = useState({});
@@ -93,8 +93,15 @@ function UserForm() {
                 // display error
             }
         } else {
-            const success = await signIn(formData);
-            if (success) {
+            const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/users/signin`, {
+                method: "POST",
+                body: JSON.stringify(formData),
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+            });
+            if (res.ok) {
+                const { user } = await res.json();
+                setUser(user);
                 navigate('/home');
             }
         }

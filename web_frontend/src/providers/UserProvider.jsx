@@ -8,16 +8,12 @@ let isFetching = false;
 export function UserProvider({ children }) {
     const [user, setUser] = useState(null);
 
-    const getCurrentUser = async (payload) => {
+    const getCurrentUser = async () => {
       if (isFetching) { return; }
 
       isFetching = true;
       const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/users/current`, {
-        ...(payload ? {
-          body: JSON.stringify(payload),
-          headers: { 'Content-Type': 'application/json' },
-        }: {}),
-        method: 'POST',
+        method: 'GET',
         credentials: 'include',
       });
       isFetching = false;
@@ -30,10 +26,6 @@ export function UserProvider({ children }) {
           getCurrentUser();
         // }, 59 * 60 * 1000);
         }, 10 * 1000);
-
-        return true;
-      } else {
-        return false;
       }
     };
 
@@ -44,7 +36,7 @@ export function UserProvider({ children }) {
     }, [user]);
 
     return (
-      <UserContext.Provider value={{ user, setUser, signIn: getCurrentUser }}>
+      <UserContext.Provider value={{ user, setUser }}>
         {children}
       </UserContext.Provider>
     );
