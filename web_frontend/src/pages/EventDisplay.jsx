@@ -34,7 +34,7 @@ function EventDisplay() {
         <>
             <Header />
             <Container>
-                <Row>
+                <Row style={{ alignItems: 'center', justifyContent: 'center' }}>
                     <Col xs={{ span: 4, offset: 1 }}>
                         <img src={event?.imageUrl} alt="this events view" style={{ maxWidth: '100%' }} />
                     </Col>

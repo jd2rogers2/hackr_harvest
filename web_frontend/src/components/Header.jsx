@@ -79,7 +79,7 @@ function Header() {
                 </>
               ) : null}
               <NavItem style={{ textAlign: 'right', paddingTop: '20px' }}>
-                <NavLink style={navLinkStyle} to="/events">All Events</NavLink>
+                <NavLink style={navLinkStyle} to="/events">Upcoming Events</NavLink>
               </NavItem>
               <NavItem style={{ textAlign: 'right', paddingTop: '20px' }}>
                 <NavLink style={navLinkStyle} to="/events?past=true">Past Events</NavLink>

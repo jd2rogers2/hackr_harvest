@@ -35,9 +35,9 @@ function Profile() {
         <>
             <Header />
             <Container>
-                <Row>
+                <Row style={{ marginBottom: '1em' }}>
                     <Col xs={{ span: 4, offset: 1 }}>
-                        <img src={user?.imageUrl} alt="this events view" style={{ maxWidth: '100%' }} />
+                        <img src={user?.imageUrl} alt="this user" style={{ maxWidth: '100%' }} />
                     </Col>
                     <Col xs={{ span: 6 }}>
                         <p style={{ fontWeight: 700, fontSize: '2em', textAlign: 'center' }}>

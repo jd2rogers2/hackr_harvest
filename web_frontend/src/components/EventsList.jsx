@@ -6,7 +6,7 @@ import Button from 'react-bootstrap/Button';
 import { EventCard } from '.';
 
 
-function EventsList({ events, hasShowMoreButton = false }) {
+function EventsList({ events, hasShowMoreButton = false, onShowMoreClick }) {
 
   return (
     <>
@@ -17,7 +17,7 @@ function EventsList({ events, hasShowMoreButton = false }) {
         <Container fluid>
           <Row>
             <Col xs={{ span: 4, offset: 8 }} sm={{ span: 2, offset: 10 }}>
-              <Button variant="primary">Show more</Button>
+              <Button variant="primary" onClick={onShowMoreClick}>Show more</Button>
             </Col>
           </Row>
         </Container>

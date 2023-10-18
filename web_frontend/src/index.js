@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 
 import {
+  Events,
   UserForm,
   EventDisplay,
   EventForm,
@@ -33,7 +34,7 @@ const router = createBrowserRouter([
   { path: "/events/create", element: <EventForm /> },
   { path: "/events/:eventId", element: <EventDisplay /> },
   // { path: "/events/:eventId/update", element: Blah },
-  // { path: "/events", element: Blah },
+  { path: "/events", element: <Events /> },
   { path: "*", element: <Navigate to="/home" replace={true} /> },
 ]);
 
