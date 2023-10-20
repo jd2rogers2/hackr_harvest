@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -7,16 +7,39 @@ import Stack from 'react-bootstrap/Stack';
 import Button from 'react-bootstrap/Button';
 
 import { Header } from '../components';
+import { UserContext } from '../providers/UserProvider';
 
 
 function EventDisplay() {
     const { eventId } = useParams();
+    const { user } = useContext(UserContext);
+
     const [event, setEvent] = useState(null);
+
+    const isGoing = user && event?.attendees.find(u => u.id === user.id);
 
     const getEvent = async () => {
         const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/events/${eventId}`);
         const data = await res.json();
         setEvent(data.event);
+    }
+
+    const handleRsvpClick = async () => {
+        const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/eventAttendees`, {
+            method: isGoing ? 'DELETE' : 'POST',
+            credentials: 'include',
+        });
+        // const data = await res.json();
+        getEvent();
+
+
+
+        // need to address these urls again
+        // need to address these urls again
+        // need to address these urls again
+        // need to address these urls again
+
+
     }
 
     useEffect(() => {
@@ -58,7 +81,12 @@ function EventDisplay() {
                 </Row>
                 <Row>
                     <Col xs={{ span: 12 }} style={{ textAlign: 'center' }}>
-                        <Button type="primary">RSVP yes!</Button>
+                        <Button
+                            type={isGoing ? "warning" : "primary"}
+                            onClick={handleRsvpClick}
+                        >
+                            RSVP {isGoing ? 'no' : 'yes!'}
+                        </Button>
                     </Col>
                 </Row>
             </Container>

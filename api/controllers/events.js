@@ -4,7 +4,7 @@ const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const jwt = require('jsonwebtoken');
 const { Op } = require("sequelize");
 
-const { Events, Users } = require('../models');
+const { Events, EventAttendees, Users } = require('../models');
 const { isAllowedFileType } = require('../helpers');
 const { s3Client } = require('../clients/s3');
 const { awsRegion } = require('../static');
@@ -75,8 +75,15 @@ const getEventById = async (req, res) => {
 };
 
 const getAllEvents = async (req, res) => {
-    const { limit = 10, offset = 0, past = false } = req.query;
-    const events = await Events.findAll({
+    const { limit = 10, offset = 0, past = false, userId } = req.query;
+
+    const cookie = req.signedCookies?.hackr_harvest;
+    const { id: currentUserId } = cookie ? jwt.verify(cookie, process.env.JWT_SECRET) : {};
+    if (userId && Number(userId) !== currentUserId) {
+        return res.status(403).send('not authorized');
+    }
+
+    let events = await Events.findAll({
         include: ['host', 'attendees'],
         order: [
             ['startTime', 'DESC'],
@@ -86,6 +93,9 @@ const getAllEvents = async (req, res) => {
         limit,
         offset,
     });
+    if (userId) {
+        events = events.filter(e => e.attendees.find(u => u.id === Number(userId)));
+    }
 
     const urls = await Promise.all(events.map(e => {
         if (!e.imageUrl) { return; }

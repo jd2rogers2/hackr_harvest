@@ -30,6 +30,7 @@ function Header() {
     setTimeout(async () => {
       const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/users/signout`, {
         method: 'POST',
+        credentials: 'include',
       });
       if (res.ok) {
         setUser(null);
@@ -74,9 +75,14 @@ function Header() {
                     <NavLink style={navLinkStyle} to={`/users/${user.id}`}>My Profile</NavLink>
                   </NavItem>
                   <NavItem style={{ textAlign: 'right', paddingTop: '20px' }}>
-                    <NavLink style={navLinkStyle} to="/users/current/events">My Events</NavLink>
+                    <NavLink style={navLinkStyle} to={`/users/${user.id}/events`}>My Events</NavLink>
                   </NavItem>
                 </>
+              ) : null}
+              {user?.role === 'admin' ? (
+                <NavItem style={{ textAlign: 'right', paddingTop: '20px' }}>
+                  <NavLink style={navLinkStyle} to="/events/create">Create Event</NavLink>
+                </NavItem>
               ) : null}
               <NavItem style={{ textAlign: 'right', paddingTop: '20px' }}>
                 <NavLink style={navLinkStyle} to="/events">Upcoming Events</NavLink>

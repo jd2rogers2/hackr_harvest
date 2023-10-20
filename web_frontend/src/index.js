@@ -16,6 +16,7 @@ import {
   Profile,
   VerifyEmail,
   ResetPassword,
+  MyEvents,
 }  from './pages';
 import { UserProvider } from './providers/UserProvider';
 
@@ -31,6 +32,7 @@ const router = createBrowserRouter([
   { path: "/users/reset", element: <ResetPassword /> },
   { path: "/users/:userId", element: <Profile /> },
   { path: "/users/:userId/update", element: <UserForm /> },
+  { path: "/users/:userId/events", element: <MyEvents /> },
   { path: "/events/create", element: <EventForm /> },
   { path: "/events/:eventId", element: <EventDisplay /> },
   // { path: "/events/:eventId/update", element: Blah },

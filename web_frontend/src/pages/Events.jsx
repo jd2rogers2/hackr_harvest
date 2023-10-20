@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { Header } from '../components';
 import { EventsList } from '../components';
@@ -10,8 +11,13 @@ function Events() {
     const [events, setEvents] = useState([]);
     const [limit, setLimit] = useState(limitIncremenet);
 
+    const [searchParams] =  useSearchParams();
+    const past = searchParams.get('past', '');
+
     const getEvents = async () => {
-        const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/events?offset=0&limit=${limit}`);
+        const pastStr = past ? '&past=true' : '';
+        const url = `http://${process.env.REACT_APP_HH_API_URL}/events?offset=0&limit=${limit}${pastStr}`;
+        const res = await fetch(url);
         if (res.ok) {
             const data = await res.json()
             setEvents(data.events);
@@ -24,11 +30,14 @@ function Events() {
 
     useEffect(() => {
         getEvents();
-    }, [limit]);
+    }, [limit, past]);
 
     return (
         <>
             <Header />
+            <h3>
+                {past ? 'Past' : 'Upcoming'}
+            </h3>
             <EventsList
                 events={events}
                 hasShowMoreButton

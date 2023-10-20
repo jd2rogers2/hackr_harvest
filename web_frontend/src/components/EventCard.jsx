@@ -26,29 +26,25 @@ function EventCard({ event }) {
 
     return (
         <Container fluid style={{ paddingBottom: '10px' }} onClick={handleEventCardClick}>
-            <Row>
-                <Col xs={{ span: 2 }}>
+            <Row style={{ alignItems: 'center' }}>
+                <Col xs={{ span: 3 }} style={{ paddingRight: 0 }}>
                     <img src={event.imageUrl} alt="the event's img" style={{ maxWidth: '100%' }} />
                 </Col>
-                <Col xs={{ span: 6 }}>
-                    <Container>
-                        <Row>
-                            <Col style={{ fontWeight: 'bold' }}>{event.name}</Col>
-                        </Row>
-                        <Row>
-                            <Col style={{ fontSize: 'x-small' }}>{datetimeText}</Col>
-                        </Row>
-                    </Container>
+                <Col xs={{ span: 5 }} style={{ paddingRight: 0 }}>
+                    <Row>
+                        <Col style={{ fontWeight: 'bold' }}>{event.name}</Col>
+                    </Row>
+                    <Row>
+                        <Col style={{ fontSize: 'x-small' }}>{datetimeText}</Col>
+                    </Row>
                 </Col>
                 <Col xs={{ span: 4 }}>
-                    <Container>
-                        <Row>
-                            <Col>{goingText}</Col>
-                        </Row>
-                        <Row>
-                            <Col>spots left: {event.attendeeLimit - event.attendees.length}</Col>
-                        </Row>
-                    </Container>
+                    <Row>
+                        <Col>{goingText}</Col>
+                    </Row>
+                    <Row>
+                        <Col>spots left: {event.attendeeLimit - event.attendees.length}</Col>
+                    </Row>
                 </Col>
             </Row>
         </Container>

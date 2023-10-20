@@ -6,6 +6,7 @@ import ResetPassword from './ResetPassword';
 import VerifyEmail from './VerifyEmail';
 import Profile from './Profile';
 import Events from './Events';
+import MyEvents from './MyEvents';
 
 export {
     UserForm,
@@ -15,5 +16,6 @@ export {
     VerifyEmail,
     Profile,
     Events,
+    MyEvents,
     ResetPassword,
 };
