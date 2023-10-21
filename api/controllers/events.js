@@ -71,6 +71,24 @@ const getEventById = async (req, res) => {
         event.imageUrl = signed;
     }
 
+    const urls = await Promise.all(event.attendees.map(user => {
+        if (!user.imageUrl) { return null; }
+
+        const Key = `${user.username}-profileImg`;
+        const command2 = new GetObjectCommand({ Bucket, Key });
+        return getSignedUrl(s3Client, command2, { expiresIn: 3600 });
+    }));
+    event.attendees.forEach((user, i) => {
+        user.imageUrl = urls[i];
+    });
+
+    if (event.host.imageUrl) {
+        const Key = `${event.host.username}-profileImg`;
+        const command3 = new GetObjectCommand({ Bucket, Key });
+        const hostImage = await getSignedUrl(s3Client, command3, { expiresIn: 3600 });
+        event.host.imageUrl = hostImage;
+    }
+
     res.send({ event });
 };
 
@@ -94,6 +112,7 @@ const getAllEvents = async (req, res) => {
         offset,
     });
     if (userId) {
+        // TODO figure out better filter with WHERE
         events = events.filter(e => e.attendees.find(u => u.id === Number(userId)));
     }
 

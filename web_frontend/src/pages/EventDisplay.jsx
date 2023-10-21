@@ -8,6 +8,7 @@ import Button from 'react-bootstrap/Button';
 
 import { Header } from '../components';
 import { UserContext } from '../providers/UserProvider';
+import UserBadge from '../components/UserBadge';
 
 
 function EventDisplay() {
@@ -17,6 +18,7 @@ function EventDisplay() {
     const [event, setEvent] = useState(null);
 
     const isGoing = user && event?.attendees.find(u => u.id === user.id);
+    const isPastEvent = new Date(event?.startTime) <= new Date(Date.now());
 
     const getEvent = async () => {
         const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/events/${eventId}`);
@@ -25,21 +27,13 @@ function EventDisplay() {
     }
 
     const handleRsvpClick = async () => {
-        const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/eventAttendees`, {
+        const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/eventAttendees/${user.id}/${eventId}`, {
             method: isGoing ? 'DELETE' : 'POST',
             credentials: 'include',
         });
-        // const data = await res.json();
-        getEvent();
-
-
-
-        // need to address these urls again
-        // need to address these urls again
-        // need to address these urls again
-        // need to address these urls again
-
-
+        if (res.ok) {
+            getEvent();
+        }
     }
 
     useEffect(() => {
@@ -48,7 +42,6 @@ function EventDisplay() {
         }
     }, [eventId]);
 
-    const attendeeNames = event?.attendees.map(user => user.username).join(', ') || '';
     const spotsLeft = event
         ? event.attendeeLimit - event.attendees.length
         : '';
@@ -57,7 +50,7 @@ function EventDisplay() {
         <>
             <Header />
             <Container>
-                <Row style={{ alignItems: 'center', justifyContent: 'center' }}>
+                <Row style={{ marginBottom: '1em', alignItems: 'center', justifyContent: 'center' }}>
                     <Col xs={{ span: 4, offset: 1 }}>
                         <img src={event?.imageUrl} alt="this events view" style={{ maxWidth: '100%' }} />
                     </Col>
@@ -72,23 +65,30 @@ function EventDisplay() {
                         <Stack>
                             <p>start date: {event?.startTime}</p>
                             <p>end date: {event?.endTime}</p>
-                            <p>host: {event?.host.username}</p>
+                            <span>host: <UserBadge user={event?.host} /></span>
                             <p>description: {event?.description}</p>
                             <p>spots left: {spotsLeft}</p>
-                            <p>who's going: {attendeeNames}</p>
+                            <span>
+                                who's going:{' '}
+                                {event?.attendees.map(user => (
+                                    <UserBadge key={user.username} user={user} />
+                                ))}
+                            </span>
                         </Stack>
                     </Col>
                 </Row>
-                <Row>
-                    <Col xs={{ span: 12 }} style={{ textAlign: 'center' }}>
-                        <Button
-                            type={isGoing ? "warning" : "primary"}
-                            onClick={handleRsvpClick}
-                        >
-                            RSVP {isGoing ? 'no' : 'yes!'}
-                        </Button>
-                    </Col>
-                </Row>
+                {user && event && !isPastEvent ? (
+                    <Row>
+                        <Col xs={{ span: 12 }} style={{ textAlign: 'center' }}>
+                            <Button
+                                variant={isGoing ? "danger" : "success"}
+                                onClick={handleRsvpClick}
+                            >
+                                RSVP {isGoing ? 'no :(' : 'yes!'}
+                            </Button>
+                        </Col>
+                    </Row>
+                ) : null}
             </Container>
         </>
     );

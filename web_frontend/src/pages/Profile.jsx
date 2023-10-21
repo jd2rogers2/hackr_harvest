@@ -35,9 +35,13 @@ function Profile() {
         <>
             <Header />
             <Container>
-                <Row style={{ marginBottom: '1em' }}>
+                <Row style={{ marginBottom: '1em', alignItems: 'center', justifyContent: 'center' }}>
                     <Col xs={{ span: 4, offset: 1 }}>
-                        <img src={user?.imageUrl} alt="this user" style={{ maxWidth: '100%' }} />
+                        <img
+                            src={user?.imageUrl || '/logo192.png'}
+                            alt="this user"
+                            style={{ maxWidth: '100%' }}
+                        />
                     </Col>
                     <Col xs={{ span: 6 }}>
                         <p style={{ fontWeight: 700, fontSize: '2em', textAlign: 'center' }}>

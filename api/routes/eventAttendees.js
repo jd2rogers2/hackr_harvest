@@ -4,7 +4,7 @@ const { eventAttendeesController } = require('../controllers');
 
 const router = express.Router();
 
-router.post('', eventAttendeesController.attendEvent);
-router.delete('', eventAttendeesController.unattendEvent);
+router.post('/:userId/:eventId', eventAttendeesController.attendEvent);
+router.delete('/:userId/:eventId', eventAttendeesController.unattendEvent);
 
 module.exports = router;
