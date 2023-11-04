@@ -13,7 +13,7 @@ function App() {
   const handleAttendEvent = async (e, event) => {
     e.preventDefault();
 
-    await fetch(`http://${REACT_APP_HH_API_URL}/eventAttendees`, {
+    await fetch(`${REACT_APP_HH_API_URL}/eventAttendees`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -26,7 +26,7 @@ function App() {
   }
 
   const getUsers = async () => {
-    const res = await fetch(`http://${REACT_APP_HH_API_URL}/users`);
+    const res = await fetch(`${REACT_APP_HH_API_URL}/users`);
     const data = await res.json();
     setUsers(data.users);
   }
@@ -41,7 +41,7 @@ function App() {
   const handleUserSubmit = async (e) => {
     e.preventDefault();
 
-    await fetch(`http://${REACT_APP_HH_API_URL}/users`, {
+    await fetch(`${REACT_APP_HH_API_URL}/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -58,7 +58,7 @@ function App() {
   }
 
   const getEvents = async () => {
-    const res = await fetch(`http://${REACT_APP_HH_API_URL}/events`);
+    const res = await fetch(`${REACT_APP_HH_API_URL}/events`);
     const data = await res.json();
     setEvents(data.events);
   }
@@ -73,7 +73,7 @@ function App() {
   const handleEventSubmit = async (e) => {
     e.preventDefault();
 
-    await fetch(`http://${REACT_APP_HH_API_URL}/events`, {
+    await fetch(`${REACT_APP_HH_API_URL}/events`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
