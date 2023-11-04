@@ -17,7 +17,7 @@ function Profile() {
     const [user, setUser] = useState(null);
 
     const getUserById = async () => {
-        const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/users/${userId}`);
+        const res = await fetch(`${process.env.REACT_APP_HH_API_URL}/users/${userId}`);
         if (res.ok) {
             const { user } = await res.json()
             setUser(user);

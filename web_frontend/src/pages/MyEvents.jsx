@@ -16,7 +16,7 @@ function MyEvents() {
     const [pastLimit, setPastLimit] = useState(limitIncremenet);
 
     const getUpcoming = async () => {
-        const url = `http://${process.env.REACT_APP_HH_API_URL}/events?offset=0&limit=${upcomingLimit}&userId=${userId}`;
+        const url = `${process.env.REACT_APP_HH_API_URL}/events?offset=0&limit=${upcomingLimit}&userId=${userId}`;
         const res = await fetch(url, {
             credentials: 'include',
         });
@@ -27,7 +27,7 @@ function MyEvents() {
     }
 
     const getPast = async () => {
-        const url = `http://${process.env.REACT_APP_HH_API_URL}/events?offset=0&limit=${upcomingLimit}&userId=${userId}&past=true`;
+        const url = `${process.env.REACT_APP_HH_API_URL}/events?offset=0&limit=${upcomingLimit}&userId=${userId}&past=true`;
         const res = await fetch(url, {
             credentials: 'include',
         });

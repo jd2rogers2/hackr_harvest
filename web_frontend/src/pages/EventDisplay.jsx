@@ -21,13 +21,13 @@ function EventDisplay() {
     const isPastEvent = new Date(event?.startTime) <= new Date(Date.now());
 
     const getEvent = async () => {
-        const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/events/${eventId}`);
+        const res = await fetch(`${process.env.REACT_APP_HH_API_URL}/events/${eventId}`);
         const data = await res.json();
         setEvent(data.event);
     }
 
     const handleRsvpClick = async () => {
-        const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/eventAttendees/${user.id}/${eventId}`, {
+        const res = await fetch(`${process.env.REACT_APP_HH_API_URL}/eventAttendees/${user.id}/${eventId}`, {
             method: isGoing ? 'DELETE' : 'POST',
             credentials: 'include',
         });

@@ -16,7 +16,7 @@ function Events() {
 
     const getEvents = async () => {
         const pastStr = past ? '&past=true' : '';
-        const url = `http://${process.env.REACT_APP_HH_API_URL}/events?offset=0&limit=${limit}${pastStr}`;
+        const url = `${process.env.REACT_APP_HH_API_URL}/events?offset=0&limit=${limit}${pastStr}`;
         const res = await fetch(url);
         if (res.ok) {
             const data = await res.json()

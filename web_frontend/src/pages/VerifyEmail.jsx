@@ -23,7 +23,7 @@ function VerifyEmail() {
         e.preventDefault();
 
         const res = await fetch(
-            `http://${process.env.REACT_APP_HH_API_URL}/users/verify`,
+            `${process.env.REACT_APP_HH_API_URL}/users/verify`,
             {
                 method: "POST",
                 body: JSON.stringify(formData),

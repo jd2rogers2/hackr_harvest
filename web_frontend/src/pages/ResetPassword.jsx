@@ -44,7 +44,7 @@ function ResetPassword() {
         }
 
         const res = await fetch(
-            `http://${process.env.REACT_APP_HH_API_URL}/users/${user.id}/reset`,
+            `${process.env.REACT_APP_HH_API_URL}/users/${user.id}/reset`,
             {
                 method: "POST",
                 body: newPassword,

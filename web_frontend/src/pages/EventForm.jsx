@@ -36,7 +36,7 @@ function EventForm() {
             }
         }
 
-        const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/events`, {
+        const res = await fetch(`${process.env.REACT_APP_HH_API_URL}/events`, {
             method: "POST",
             body: FORMatted,
             credentials: 'include',

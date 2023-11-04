@@ -28,7 +28,7 @@ function Header() {
   const handleSignOutClick = () => {
     // wait 1 sec in case any getCurrentUser is firing
     setTimeout(async () => {
-      const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/users/signout`, {
+      const res = await fetch(`${process.env.REACT_APP_HH_API_URL}/users/signout`, {
         method: 'POST',
         credentials: 'include',
       });

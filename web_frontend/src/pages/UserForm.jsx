@@ -74,7 +74,7 @@ function UserForm() {
         }
 
         if (user) {
-            const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/users/${user.id}`, {
+            const res = await fetch(`${process.env.REACT_APP_HH_API_URL}/users/${user.id}`, {
                 method: 'PATCH',
                 body: JSON.stringify(formData),
                 headers: { 'Content-Type': 'application/json' },
@@ -83,7 +83,7 @@ function UserForm() {
                 navigate(`/users/${user.id}`);
             }
         } else if (authPageKey === 'signup') {
-            const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/users/signup`, {
+            const res = await fetch(`${process.env.REACT_APP_HH_API_URL}/users/signup`, {
                 method: "POST",
                 body: FORMatted,
             });
@@ -93,7 +93,7 @@ function UserForm() {
                 // display error
             }
         } else {
-            const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/users/signin`, {
+            const res = await fetch(`${process.env.REACT_APP_HH_API_URL}/users/signin`, {
                 method: "POST",
                 body: JSON.stringify(formData),
                 headers: { 'Content-Type': 'application/json' },

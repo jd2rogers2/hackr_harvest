@@ -10,7 +10,7 @@ function Home() {
   const navigate = useNavigate();
 
   const getEvents = async () => {
-    const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/events?limit=3`);
+    const res = await fetch(`${process.env.REACT_APP_HH_API_URL}/events?limit=3`);
     const data = await res.json();
     setEvents(data.events);
   }

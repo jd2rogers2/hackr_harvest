@@ -22,7 +22,7 @@ export function UserProvider({ children }) {
       if (isFetching) { return; }
 
       isFetching = true;
-      const res = await fetch(`http://${process.env.REACT_APP_HH_API_URL}/users/current`, {
+      const res = await fetch(`${process.env.REACT_APP_HH_API_URL}/users/current`, {
         method: 'GET',
         credentials: 'include',
       });
