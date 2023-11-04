@@ -5,8 +5,8 @@ const { awsRegion } = require('../static');
 
 const clientConfig = {
     credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+        accessKeyId: process.env.AMZN_SDK_ACCESS_KEY,
+        secretAccessKey: process.env.AMZN_SDK_SECRET_ACCESS_KEY,
     },
     region: awsRegion,
 };

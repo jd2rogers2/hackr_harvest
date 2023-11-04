@@ -10,7 +10,12 @@ TODOs:
 - Lambda
     - move 1 endpoint to lambda? (test performance before and after)
 - finish page functionality fe+be
+    - block RSVPs when limit is hit
     - double check desktop doesn't look like trash
+    - user edit
+    - reset password
+    - edit event
+    - delete event
 
 - mess around with cloud watch
 - put api behind api gateway
