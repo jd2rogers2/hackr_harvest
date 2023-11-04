@@ -12,6 +12,8 @@ let corsOptions = {
 
 const app = express();
 
+app.options('*', cors(corsOptions));
+
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser(process.env.COOKIE_SECRET));
