@@ -31,3 +31,4 @@ services:
       - COGNITO_CLIENT_ID=${COGNITO_CLIENT_ID}
       - COOKIE_SECRET=${COOKIE_SECRET}
       - JWT_SECRET=${JWT_SECRET}
+      - HH_WEB_FE_URL=localhost:3001
