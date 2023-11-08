@@ -17,6 +17,7 @@ TODOs:
     - edit event
     - delete event
 
+- can i store profile images (and everything) in cognito?
 - mess around with cloud watch
 - put api behind api gateway
 - add elasticache to db
