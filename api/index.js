@@ -7,7 +7,7 @@ const { eventAttendeesRouter, eventsRouter, usersRouter } = require('./routes');
 
 let corsOptions = {
   credentials: true,
-  origin: [process.env.HH_WEB_FE_URL],
+  origin: process.env.HH_WEB_FE_URL,
 };
 
 const app = express();
