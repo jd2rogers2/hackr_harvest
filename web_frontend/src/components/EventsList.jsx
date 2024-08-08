@@ -7,7 +7,6 @@ import { EventCard } from '.';
 
 
 function EventsList({ events, hasShowMoreButton = false, onShowMoreClick }) {
-
   return (
     <>
       {events.map(event => (

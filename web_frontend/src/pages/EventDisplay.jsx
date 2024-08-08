@@ -5,15 +5,19 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Stack from 'react-bootstrap/Stack';
 import Button from 'react-bootstrap/Button';
+import { useNavigate } from "react-router-dom";
 
 import { Header } from '../components';
 import { UserContext } from '../providers/UserProvider';
 import UserBadge from '../components/UserBadge';
+import { ToastContext } from '../providers/ToastProvider';
 
 
 function EventDisplay() {
     const { eventId } = useParams();
     const { user } = useContext(UserContext);
+    const { sendToastMessage } = useContext(ToastContextContext);
+    const navigate = useNavigate();
 
     const [event, setEvent] = useState(null);
 
@@ -36,6 +40,17 @@ function EventDisplay() {
         }
     }
 
+    const handleDeleteClick = async () => {
+      const res = await fetch(`${process.env.REACT_APP_HH_API_URL}/events/${eventId}`, {
+          method: 'DELETE',
+          credentials: 'include',
+      });
+      if (res.ok) {
+          sendToastMessage(`Successfully deleted event ${event.name}`);
+          navigate('/events');
+      }
+  }
+
     useEffect(() => {
         if (eventId) {
             getEvent();
@@ -50,9 +65,15 @@ function EventDisplay() {
         <>
             <Header />
             <Container>
+                {user?.role === 'admin' ? (
+                    <Button
+                        variant="danger"
+                        onClick={handleDeleteClick}
+                    >Delete this event</Button>
+                ) : null}
                 <Row style={{ marginBottom: '1em', alignItems: 'center', justifyContent: 'center' }}>
                     <Col xs={{ span: 4, offset: 1 }}>
-                        <img src={event?.imageUrl} alt="this events view" style={{ maxWidth: '100%' }} />
+                        <img src={event?.imageUrl} alt="this event's photo" style={{ maxWidth: '100%' }} />
                     </Col>
                     <Col xs={{ span: 6 }}>
                         <p style={{ fontWeight: 700, fontSize: '2em', textAlign: 'center' }}>

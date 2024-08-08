@@ -19,6 +19,7 @@ import {
   MyEvents,
 }  from './pages';
 import { UserProvider } from './providers/UserProvider';
+import { ToastProvider } from './providers/ToastProvider';
 
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -44,9 +45,11 @@ const router = createBrowserRouter([
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <UserProvider>
-      <RouterProvider router={router} />
-    </UserProvider>
+    <ToastProvider>
+      <UserProvider>
+        <RouterProvider router={router} />
+      </UserProvider>
+    </ToastProvider>
   </React.StrictMode>
 );
 

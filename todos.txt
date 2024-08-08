@@ -1,5 +1,7 @@
 TODOs:
 
+- selected "optional MFA" for cognito, do i need to get phone nums and store in cognito now?
+  or in RDS user table?
 
 - ci/cd with code deploy/code build
     - deploy frontend on s3
@@ -17,7 +19,7 @@ TODOs:
     - edit event
     - delete event
 
-- can i store profile images (and everything) in cognito?
+- can i store profile image_urls (and everything) in cognito?
 - mess around with cloud watch
 - put api behind api gateway
 - add elasticache to db

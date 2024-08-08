@@ -3,7 +3,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Stack from 'react-bootstrap/Stack';
-import Button from 'react-bootstrap/Button';
+import { NavLink } from "react-router-dom";
 
 import { Header } from '../components';
 import { UserContext } from '../providers/UserProvider';
@@ -64,7 +64,7 @@ function Profile() {
                 {isCurrentUser ? (
                     <Row>
                         <Col xs={{ span: 12 }} style={{ textAlign: 'center' }}>
-                            <Button type="primary">Edit Profile</Button>
+                          <NavLink to={`/users/${user.id}/update`}>Update Profile</NavLink>
                         </Col>
                     </Row>
                 ) : null}

@@ -36,7 +36,7 @@ function Events() {
         <>
             <Header />
             <h3>
-                {past ? 'Past' : 'Upcoming'}
+                {past ? 'Past' : 'Upcoming'} Events
             </h3>
             <EventsList
                 events={events}

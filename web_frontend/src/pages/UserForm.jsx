@@ -11,9 +11,17 @@ import { UserContext } from '../providers/UserProvider';
 
 const userSchema = object({
     username: string().required(),
+    /*
+      8 chars long
+      Contains at least 1 number
+      Contains at least 1 special character
+      Contains at least 1 uppercase letter
+      Contains at least 1 lowercase letter
+    */
     password: string().required().min(8)
         .matches(/[A-Z]+/) // incl upper
         .matches(/[a-z]+/) // incl lower
+        // .matches(/[\^\$\*\.\[\]{}()?\-\"!@#%&\/\\,><':;|_~`+=]+"]+/) // incl special char
         // .matches(new RegExp("[\^\$\*\.\[\]{}()?\-\"!@#%&\/\\,><':;|_~`+=]+")) // incl special char
         .matches(/\d+/), // incl number
     email: string().email().required(),
@@ -29,8 +37,7 @@ function UserForm() {
     const authPageKey = location.pathname.includes('signup') ? 'signup' : 'signin';
     const { user, setUser } = useContext(UserContext);
 
-    // set user into formData to start for edit forms
-    const [formData, setFormData] = useState({});
+    const [formData, setFormData] = useState(user ? user : {});
     const [passwordError, setPasswordError] = useState(false);
 
     const handleInputChange = async (e) => {
@@ -161,7 +168,14 @@ function UserForm() {
                             />
                         </Form.Group>
                         <Form.Group className="mb-3">
-                            <label htmlFor="imageUrl">imageUrl</label>
+                            <label htmlFor="imageUrl">{user?.imageUrl ? 'New ' : ''}imageUrl</label>
+                            {user?.imageUrl && (
+                                <img
+                                    style={{ width: '100px', height: '100px' }}
+                                    src={user.imageUrl}
+                                    alt="your profile photo"
+                                />
+                            )}
                             <input
                                 type="file"
                                 id="imageUrl"
